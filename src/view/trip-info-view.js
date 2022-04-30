@@ -14,7 +14,7 @@ const createTripInfoTemplate = () => (`
   </section>
   `);
 
-export class TripInfoView {
+export default class TripInfoView {
   getTemplate() {
     return createTripInfoTemplate();
   }
