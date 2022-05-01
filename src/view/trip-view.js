@@ -14,7 +14,8 @@ const createTripTemplate = (trip) => {
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
   const getOffersOfTrip = (offerstrip, typeoftrip) => {
-    return offerstrip.find((item) => item.type === typeoftrip);
+    const offersOfTrip =  offerstrip.find((item) => item.type === typeoftrip);
+    return offersOfTrip;
   };
 
   const createAdditionalServices = () => (
@@ -70,8 +71,6 @@ export class TripView {
   constructor(trip) {
     this.trip = trip;
   }
-
-  // const isTaskRepeating = (repeating) => Object.values(repeating).some(Boolean);
 
   getTemplate() {
     return createTripTemplate(this.trip);

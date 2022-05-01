@@ -16,4 +16,9 @@ const getRandomArray = (array) => {
   return newArray;
 };
 
-export { getRandomInteger, getRandomArray, humanizeTripDueDate, humanizeTripDueDateTwo, getDurationTime };
+const minFromArray = (items) => {
+  const minItem = items.reduce((accumulator, currentValue) => accumulator < currentValue ? accumulator : currentValue);
+  return minItem;
+};
+
+export { getRandomInteger, getRandomArray, humanizeTripDueDate, humanizeTripDueDateTwo, getDurationTime, minFromArray };
