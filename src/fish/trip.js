@@ -79,20 +79,30 @@ const generateDestinationOfTrip = () => {
 };
 
 
-const generateOffersOfType = () => {
+const getOffersOfType = () => {
   const offersOfTrip = [
     {
       type: 'taxi',
       offers: [
         {
           id: 1,
-          title: 'Upgrade to a business class',
-          price: 120
+          title: 'Order Uber',
+          price: 20
+        }
+      ]
+    },
+    {
+      type: 'flight',
+      offers: [
+        {
+          id: 1,
+          title: 'Add luggage',
+          price: 50
         },
         {
           id: 2,
-          title: 'Choose the radio station',
-          price: 60
+          title: 'Switch to comfort',
+          price: 80
         }
       ]
     },
@@ -125,20 +135,44 @@ const generateOffersOfType = () => {
           price: 50
         }
       ]
+    },
+    {
+      type: 'check-in',
+      offers: [
+        {
+          id: 1,
+          title: 'Add breakfast',
+          price: 50
+        }
+      ]
+    },
+    {
+      type: 'sightseeing',
+      offers: [
+        {
+          id: 1,
+          title: 'Book tickets',
+          price: 40
+        },
+        {
+          id: 2,
+          title: 'Lunch in city',
+          price: 30
+        }
+      ]
     }
   ];
 
-  const randomIndex = getRandomInteger(0, offersOfTrip.length - 1);
-  return offersOfTrip[randomIndex];
+  return offersOfTrip;
 };
 
 export const generateTrip = () => ({
   basePrice: getRandomInteger(500, 1500),
-  dateFrom: null,
-  dateTo: null,
+  dateFrom: '2019-07-10T22:55:56.845Z',
+  dateTo: '2019-07-11T11:22:13.375Z',
   destination: generateDestinationOfTrip(),
   id: '0',
-  isFavorite: false,
-  offers: generateOffersOfType(),
+  isFavorite: getRandomInteger(0, 1),
+  offers: getOffersOfType(),
   type: generateTypeOfTrip(),
 });

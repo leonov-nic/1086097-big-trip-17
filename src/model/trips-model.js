@@ -1,7 +1,7 @@
 import { generateTrip } from '../fish/trip';
 
 export default class TripsModel {
-  tasks = Array.from({length: 5}, generateTrip);
+  trips = Array.from({length: 7}, generateTrip);
 
-  getTasks = () => this.tasks;
+  getTrips = () => this.trips;
 }
