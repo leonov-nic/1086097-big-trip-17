@@ -14,12 +14,12 @@ const createTripTemplate = (trip) => {
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
   const createAdditionalServices = () => (
-    offers.offers ? `${Object.entries(offers.offers).map(([index, obj]) =>
+    offers.offers ? `${Object.values(offers.offers).map((offer) =>
       `
       <li class="event__offer">
-        <span class="event__offer-title">${obj.title}</span>
+        <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${obj.price}</span>
+        <span class="event__offer-price">${offer.price}</span>
       </li>
       `
     ).join('\n')}` : ''

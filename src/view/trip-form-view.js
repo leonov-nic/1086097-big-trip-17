@@ -6,7 +6,7 @@ import { offersOfTrip } from '../const';
 const createTripFormTemplate = (trip) => {
   const randomIndex = getRandomInteger(0, trip.length - 1);
   const randomTrip = trip[randomIndex];
-  const {type, basePrice, destination, dateFrom, dateTo, isFavorite, offers} = randomTrip;
+  const {type, basePrice, destination, dateFrom, dateTo, offers} = randomTrip;
 
   const newDateFrom = humanizeTripDueDateThird(dateFrom);
   const newDateTo = humanizeTripDueDateThird(dateTo);
@@ -17,9 +17,6 @@ const createTripFormTemplate = (trip) => {
     const title = currenttrip.some((item) => item.title === offerstrip.title);
     return title;
   };
-
-  console.log(isTitleInTrip(currentTripOffers, offersOfTrip[2]));
-
 
   return (`
     <li class="trip-events__item">
@@ -119,14 +116,15 @@ const createTripFormTemplate = (trip) => {
           <section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
+
             <div class="event__available-offers">
-              ${Object.entries(offersOfTrip).map(([index, obj]) => `
+              ${Object.values(offersOfTrip).map((offer) => `
                 <div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isTitleInTrip(currentTripOffers, obj.title) ? 'checked' : ''}>
+                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isTitleInTrip(currentTripOffers, offer.title) ? 'checked' : ''}>
                   <label class="event__offer-label" for="event-offer-luggage-1">
-                    <span class="event__offer-title">${obj.title}</span>
+                    <span class="event__offer-title">${offer.title}</span>
                     &plus;&euro;&nbsp;
-                    <span class="event__offer-price">${obj.price}</span>
+                    <span class="event__offer-price">${offer.price}</span>
                   </label>
                 </div>`)}
             </div>
