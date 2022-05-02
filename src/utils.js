@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 
 const humanizeTripDueDate = (date) => dayjs(date).format('HH:mm');
 const humanizeTripDueDateTwo = (date) => dayjs(date).format('MMM D');
+const humanizeTripDueDateThird = (date) => dayjs(date).format('YY/MM/DD HH:mm');
 const getDurationTime = (dateto, datefrom) => dayjs(dateto).diff(dayjs(datefrom), 'Minute');
 
 const getRandomInteger = (a = 0, b = 1) => {
@@ -21,4 +22,4 @@ const minFromArray = (items) => {
   return minItem;
 };
 
-export { getRandomInteger, getRandomArray, humanizeTripDueDate, humanizeTripDueDateTwo, getDurationTime, minFromArray };
+export { getRandomInteger, getRandomArray, humanizeTripDueDate, humanizeTripDueDateTwo, getDurationTime, minFromArray, humanizeTripDueDateThird };

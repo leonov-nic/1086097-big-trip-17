@@ -1,20 +1,10 @@
-import {getRandomInteger, getRandomArray} from '../utils.js';
+import {getRandomInteger, getRandomArray} from '../utils';
+import {typeOfTrip} from '../const';
 
-const generateTypeOfTrip = () => {
-  const typeOfTrip = [
-    'taxi',
-    'bus',
-    'train',
-    'ship',
-    'drive',
-    'flight',
-    'check-in',
-    'sightseeing',
-    'restaurant',
-  ];
 
-  const randomIndex = getRandomInteger(0, typeOfTrip.length - 1);
-  return typeOfTrip[randomIndex];
+const generateTypeOfTrip = (typesoftrip, offerstrip) => {
+  const type =  typesoftrip.find((item) => item === offerstrip.type);
+  return type;
 };
 
 const generateDescriptionForDestination = () => {
@@ -45,39 +35,32 @@ const generateDestinationOfTrip = () => {
     {
       description: generateDescriptionForDestination(),
       name: 'Chamonix',
-      pictures: [
-        {
-          src: generatePicturesForDestination(),
-          description: 'Chamonix parliament building',
-        },
-      ],
+      pictures: {
+        src: generatePicturesForDestination(),
+        description: 'Chamonix parliament building',
+      },
     },
     {
       description: generateDescriptionForDestination(),
       name: 'Geneva',
-      pictures: [
-        {
-          src: generatePicturesForDestination(),
-          description: 'Geneva',
-        },
-      ],
+      pictures: {
+        src: generatePicturesForDestination(),
+        description: 'Geneva',
+      },
     },
     {
       description: generateDescriptionForDestination(),
       name: 'Amsterdam',
-      pictures: [
-        {
-          src: generatePicturesForDestination(),
-          description: 'Amsterdam',
-        },
-      ],
+      pictures: {
+        src: generatePicturesForDestination(),
+        description: 'Amsterdam',
+      },
     },
   ];
 
   const randomIndex = getRandomInteger(0, descriptionOfTrip.length - 1);
   return descriptionOfTrip[randomIndex];
 };
-
 
 const getOffersOfType = () => {
   const offersOfTrip = [
@@ -160,10 +143,21 @@ const getOffersOfType = () => {
           price: 30
         }
       ]
+    },
+    {
+      type: 'drive',
+      offers: [
+        {
+          id: 1,
+          title: 'Rent a car',
+          price: 200
+        }
+      ]
     }
   ];
 
-  return offersOfTrip;
+  const randomIndex = getRandomInteger(0, offersOfTrip.length - 1);
+  return offersOfTrip[randomIndex];
 };
 
 export const generateTrip = () => ({
@@ -174,5 +168,5 @@ export const generateTrip = () => ({
   id: '0',
   isFavorite: getRandomInteger(0, 1),
   offers: getOffersOfType(),
-  type: generateTypeOfTrip(),
+  type: generateTypeOfTrip(typeOfTrip, getOffersOfType()),
 });

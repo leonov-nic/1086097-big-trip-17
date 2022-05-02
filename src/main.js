@@ -8,7 +8,7 @@ import { render } from './render';
 import TripsModel from './model/trips-model';
 const tripsModel = new TripsModel;
 
-console.log(tripsModel);
+// console.log(tripsModel);
 
 const siteTripMainElement = document.querySelector('.trip-main');
 

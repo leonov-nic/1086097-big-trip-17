@@ -13,18 +13,13 @@ const createTripTemplate = (trip) => {
   const minute = (getDurationTime(dateTo, dateFrom)) - 60 * hour;
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
-  const getOffersOfTrip = (offerstrip, typeoftrip) => {
-    const offersOfTrip =  offerstrip.find((item) => item.type === typeoftrip);
-    return offersOfTrip;
-  };
-
   const createAdditionalServices = () => (
-    getOffersOfTrip(offers, type) !== undefined ? `${Object.values(getOffersOfTrip(offers, type).offers).map((offer) =>
+    offers.offers ? `${Object.entries(offers.offers).map(([index, obj]) =>
       `
       <li class="event__offer">
-        <span class="event__offer-title">${offer.title}</span>
+        <span class="event__offer-title">${obj.title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
+        <span class="event__offer-price">${obj.price}</span>
       </li>
       `
     ).join('\n')}` : ''
