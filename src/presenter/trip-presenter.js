@@ -18,11 +18,15 @@ export class TripPresenter {
 
     render(new tripSortView, this.#tripContainer);
     render(this.#tripListComponent, this.#tripContainer);
-    render(new TripFormView(this.#trips), this.#tripListComponent.element);
+    // render(new TripFormView(this.#trips), this.#tripListComponent.element);
 
     for (let i = 0; i < this.#trips.length; i++) {
-      render(new TripView(this.#trips[i]), this.#tripListComponent.element);
+      this.#renderTrip(this.#trips[i]);
     }
+  };
 
+  #renderTrip = (trip) => {
+    const tripComponent = new TripView(trip);
+    render(tripComponent, this.#tripListComponent.element);
   };
 }
