@@ -1,16 +1,12 @@
 import { createElement } from '../render';
-import { getRandomInteger } from '../utils';
 import { humanizeTripDueDateThird } from '../utils';
 import { offersOfTrip } from '../const';
 
-const createTripFormTemplate = (trips) => {
+const createTripFormTemplate = (trip) => {
+  const {type, basePrice, destination, dateFrom, dateTo, offers} = trip;
+  const generateAllOffersOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
 
-  const generateTypeOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
-  const randomIndex = getRandomInteger(0, trips.length - 1);
-
-  const randomTrip = trips[randomIndex];
-  const {type, basePrice, destination, dateFrom, dateTo, offers} = randomTrip;
-  const allCurrentOffers = generateTypeOfTrip(offersOfTrip, randomTrip);
+  const allCurrentOffers = generateAllOffersOfTrip(offersOfTrip, trip);
 
   const newDateFrom = humanizeTripDueDateThird(dateFrom);
   const newDateTo = humanizeTripDueDateThird(dateTo);
@@ -125,6 +121,9 @@ const createTripFormTemplate = (trips) => {
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
         <section class="event__details">
           <section class="event__section  event__section--offers">
@@ -135,15 +134,8 @@ const createTripFormTemplate = (trips) => {
           </section>
 
           <section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+            <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
             <p class="event__destination-description">${destination.description}</p>
-
-            <div class="event__photos-container">
-              <div class="event__photos-tape">
-                <img class="event__photo" src="${destination.pictures.src}" alt="${destination.pictures.description}">
-
-              </div>
-            </div>
           </section>
         </section>
       </form>
