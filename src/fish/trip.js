@@ -96,11 +96,6 @@ const getOffersOfType = () => {
           id: 1,
           title: 'Add meal',
           price: 15
-        },
-        {
-          id: 2,
-          title: 'Choose seats',
-          price: 5
         }
       ]
     },
@@ -109,13 +104,8 @@ const getOffersOfType = () => {
       offers: [
         {
           id: 1,
-          title: 'Add meal',
+          title: 'Book tickets',
           price: 555
-        },
-        {
-          id: 2,
-          title: 'Choose eat',
-          price: 50
         }
       ]
     },

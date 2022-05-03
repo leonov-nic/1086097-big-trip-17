@@ -3,23 +3,37 @@ import { getRandomInteger } from '../utils';
 import { humanizeTripDueDateThird } from '../utils';
 import { offersOfTrip } from '../const';
 
-const createTripFormTemplate = (trip) => {
-  const randomIndex = getRandomInteger(0, trip.length - 1);
-  const randomTrip = trip[randomIndex];
+const createTripFormTemplate = (trips) => {
+
+  const generateTypeOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
+  const randomIndex = getRandomInteger(0, trips.length - 1);
+
+  const randomTrip = trips[randomIndex];
   const {type, basePrice, destination, dateFrom, dateTo, offers} = randomTrip;
+  const allCurrentOffers = generateTypeOfTrip(offersOfTrip, randomTrip);
 
   const newDateFrom = humanizeTripDueDateThird(dateFrom);
   const newDateTo = humanizeTripDueDateThird(dateTo);
 
   const currentTripOffers = Object.values(offers.offers);
 
-  const isTitleInTrip = (currenttrip, offerstrip) => {
-    const title = currenttrip.some((item) => item.title === offerstrip.title);
-    return title;
-  };
+  const createOffersOfTrip = () => (
+    allCurrentOffers.offers.map((offer) => {
+      const checked = currentTripOffers.some((item) => item.id === offer.id);
+      return (`
+        <div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${checked ? 'checked' : ''}>
+          <label class="event__offer-label" for="event-offer-luggage-1">
+            <span class="event__offer-title">${offer.title}</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">${offer.price}</span>
+          </label>
+        </div>`);
+    }).join('')
+  );
 
   return (`
-    <li class="trip-events__item">
+    <li class="trip-evnts__item">
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
@@ -115,18 +129,8 @@ const createTripFormTemplate = (trip) => {
         <section class="event__details">
           <section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-
             <div class="event__available-offers">
-              ${Object.values(offersOfTrip).map((offer) => `
-                <div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isTitleInTrip(currentTripOffers, offer.title) ? 'checked' : ''}>
-                  <label class="event__offer-label" for="event-offer-luggage-1">
-                    <span class="event__offer-title">${offer.title}</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">${offer.price}</span>
-                  </label>
-                </div>`)}
+              ${createOffersOfTrip()}
             </div>
           </section>
 
