@@ -4,9 +4,9 @@ import { offersOfTrip } from '../const';
 
 const createTripFormTemplate = (trip) => {
   const {type, basePrice, destination, dateFrom, dateTo, offers} = trip;
-  const generateAllOffersOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
 
-  const allCurrentOffers = generateAllOffersOfTrip(offersOfTrip, trip);
+  const generateAllOffersOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
+  const allCurrentOfTypeOffers = generateAllOffersOfTrip(offersOfTrip, trip);
 
   const newDateFrom = humanizeTripDueDateThird(dateFrom);
   const newDateTo = humanizeTripDueDateThird(dateTo);
@@ -14,7 +14,7 @@ const createTripFormTemplate = (trip) => {
   const currentTripOffers = Object.values(offers.offers);
 
   const createOffersOfTrip = () => (
-    allCurrentOffers.offers.map((offer) => {
+    allCurrentOfTypeOffers.offers.map((offer) => {
       const checked = currentTripOffers.some((item) => item.id === offer.id);
       return (`
         <div class="event__offer-selector">
@@ -125,6 +125,7 @@ const createTripFormTemplate = (trip) => {
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
+
         <section class="event__details">
           <section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
