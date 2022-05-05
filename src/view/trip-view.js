@@ -63,23 +63,25 @@ const createTripTemplate = (trip) => {
 };
 
 export class TripView {
+  #element = null;
+
   constructor(trip) {
     this.trip = trip;
   }
 
-  getTemplate() {
+  get template() {
     return createTripTemplate(this.trip);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

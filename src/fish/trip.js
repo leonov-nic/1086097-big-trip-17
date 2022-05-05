@@ -1,11 +1,4 @@
 import {getRandomInteger, getRandomArray} from '../utils';
-import {typeOfTrip} from '../const';
-
-
-const generateTypeOfTrip = (typesoftrip, offerstrip) => {
-  const type =  typesoftrip.find((item) => item === offerstrip.type);
-  return type;
-};
 
 const generateDescriptionForDestination = () => {
   const descriptionForDestination = [
@@ -62,7 +55,7 @@ const generateDestinationOfTrip = () => {
   return descriptionOfTrip[randomIndex];
 };
 
-const getOffersOfType = () => {
+const getOffersOfTrip = () => {
   const offersOfTrip = [
     {
       type: 'taxi',
@@ -150,13 +143,16 @@ const getOffersOfType = () => {
   return offersOfTrip[randomIndex];
 };
 
-export const generateTrip = () => ({
-  basePrice: getRandomInteger(500, 1500),
-  dateFrom: '2019-07-10T22:55:56.845Z',
-  dateTo: '2019-07-11T11:22:13.375Z',
-  destination: generateDestinationOfTrip(),
-  id: '0',
-  isFavorite: getRandomInteger(0, 1),
-  offers: getOffersOfType(),
-  type: generateTypeOfTrip(typeOfTrip, getOffersOfType()),
-});
+export const generateTrip = () => {
+  const generateOffers = getOffersOfTrip();
+  return ({
+    basePrice: getRandomInteger(500, 1500),
+    dateFrom: '2019-07-10T22:55:56.845Z',
+    dateTo: '2019-07-11T11:22:13.375Z',
+    destination: generateDestinationOfTrip(),
+    id: '0',
+    isFavorite: getRandomInteger(0, 1),
+    offers: generateOffers,
+    type: generateOffers.type,
+  });
+};
