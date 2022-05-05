@@ -7,10 +7,8 @@ const createTripTemplate = (trip) => {
 
   const newDateTo = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
   const dateStart = humanizeTripDueDateTwo(dateFrom);
-  const newDateFrom = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
+  const dateFinish = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
   const durationTime = getDurationTime(dateTo, dateFrom);
-  const hour = Math.round(durationTime / 60);
-  const minute = (getDurationTime(dateTo, dateFrom)) - 60 * hour;
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
   const createAdditionalServices = () => (
@@ -30,16 +28,16 @@ const createTripTemplate = (trip) => {
       <div class="event">
         <time class="event__date" datetime="2019-03-18">${ dateStart }</time>
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${ type }.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${ type } ${ destination.name }</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${ newDateFrom }</time>
+            <time class="event__start-time" datetime="2019-03-18T10:30">${ dateFinish }</time>
             &mdash;
             <time class="event__end-time" datetime="2019-03-18T11:00">${ newDateTo }</time>
           </p>
-          <p class="event__duration">${hour && hour > 0 ? `${hour}H`: '' } ${ minute }M</p>
+          <p class="event__duration">${ durationTime }</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${ basePrice }</span>
