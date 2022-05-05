@@ -143,16 +143,16 @@ const getOffersOfTrip = () => {
   return offersOfTrip[randomIndex];
 };
 
-export const generateTrip = () => {
-  const generateOffers = getOffersOfTrip();
+export const generateTrips = () => {
+  const offersOfTrip = getOffersOfTrip();
   return ({
     basePrice: getRandomInteger(500, 1500),
     dateFrom: '2019-07-10T22:55:56.845Z',
-    dateTo: '2019-07-11T11:22:13.375Z',
+    dateTo: `2019-07-11T${getRandomInteger(10, 18)}:22:13.375Z`,
     destination: generateDestinationOfTrip(),
     id: '0',
     isFavorite: getRandomInteger(0, 1),
-    offers: generateOffers,
-    type: generateOffers.type,
+    offers: offersOfTrip,
+    type: offersOfTrip.type,
   });
 };

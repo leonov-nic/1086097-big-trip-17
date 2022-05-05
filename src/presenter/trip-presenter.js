@@ -3,17 +3,31 @@ import { tripSortView } from '../view/trip-sort-view';
 import { TripListView } from '../view/trip-list-view';
 import { TripFormView } from '../view/trip-form-view';
 import { TripView } from '../view/trip-view';
+import NoTripsView from '../view/no-trips-view';
 
 export class TripPresenter {
   #tripListComponent = new TripListView();
+  #noTripsComponent = new NoTripsView();
   #tripContainer = null;
   #tripsModel = null;
   #trips = null;
 
-  init = (tripContainer, tripsModel) => {
+  constructor (tripContainer, tripsModel) {
     this.#tripContainer = tripContainer;
     this.#tripsModel = tripsModel;
+  }
+
+  init = () => {
     this.#trips = [...this.#tripsModel.trips];
+    this.#renderList();
+  };
+
+  #renderList = () => {
+    if (this.#trips.every((trip) => trip.isThere)) {
+      render(this.#tripListComponent, this.#tripContainer);
+      render(this.#noTripsComponent, this.#tripListComponent.element);
+      return;
+    }
 
     render(new tripSortView, this.#tripContainer);
     render(this.#tripListComponent, this.#tripContainer);
@@ -26,6 +40,8 @@ export class TripPresenter {
   #renderTrip = (trip) => {
     const tripComponent = new TripView(trip);
     const tripFormComponent = new TripFormView(trip);
+
+    render(tripComponent, this.#tripListComponent.element);
 
     const replaceFormToTrip = () => {
       this.#tripListComponent.element.replaceChild(tripComponent.element, tripFormComponent.element);
@@ -53,7 +69,5 @@ export class TripPresenter {
     });
 
     tripFormComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceFormToTrip);
-
-    render(tripComponent, this.#tripListComponent.element);
   };
 }
