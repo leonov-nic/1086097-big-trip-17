@@ -21,7 +21,7 @@ const createTripFilterTemplate = () => (`
   </form>
   `);
 
-export class tripFilterView {
+export class TripFilterView {
   getTemplate() {
     return createTripFilterTemplate();
   }
