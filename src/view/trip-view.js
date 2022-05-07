@@ -1,4 +1,4 @@
-import { createElement } from '../render';
+import AbstractView from '../framework/view/abstract-view';
 import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo } from '../utils';
 
 
@@ -60,26 +60,15 @@ const createTripTemplate = (trip) => {
   `);
 };
 
-export class TripView {
-  #element = null;
+export class TripView extends AbstractView {
+  #trip = null;
 
   constructor(trip) {
+    super();
     this.trip = trip;
   }
 
   get template() {
     return createTripTemplate(this.trip);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

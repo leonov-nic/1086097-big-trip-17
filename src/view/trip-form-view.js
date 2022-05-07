@@ -1,6 +1,29 @@
-import { createElement } from '../render';
+import AbstractView from '../framework/view/abstract-view';
 import { humanizeTripDueDateThird } from '../utils';
 import { offersOfTrip } from '../const';
+
+const newBlankTrip = {
+  basePrice: '',
+  dateFrom: 'null',
+  dateTo: 'null',
+  destination: {
+    description: '',
+    name: '',
+    pictures: [
+      {
+        src: '',
+        description: '',
+      }
+    ]
+  },
+  id: '',
+  isFavorite: false,
+  offers: {
+    type: '',
+    offers: [],
+  },
+  type: '',
+};
 
 const createTripFormTemplate = (trip) => {
   const {type, basePrice, destination, dateFrom, dateTo, offers, id} = trip;
@@ -144,27 +167,15 @@ const createTripFormTemplate = (trip) => {
   `);
 };
 
-export class TripFormView {
-  #element = null;
+export class TripFormView extends AbstractView {
   #trip = null;
 
-  constructor(trip) {
+  constructor(trip = newBlankTrip) {
+    super();
     this.#trip = trip;
   }
 
   get template() {
     return createTripFormTemplate(this.#trip);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
