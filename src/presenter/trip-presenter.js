@@ -41,10 +41,9 @@ export class TripPresenter {
     const tripComponent = new TripView(trip);
     const tripFormComponent = new TripFormView(trip);
 
-    render(tripComponent, this.#tripListComponent.element);
-
     const replaceFormToTrip = () => {
       this.#tripListComponent.element.replaceChild(tripComponent.element, tripFormComponent.element);
+      tripFormComponent.element.classList.remove('active');
     };
 
     function onEscKeyDown (evt) {
@@ -56,8 +55,25 @@ export class TripPresenter {
     }
 
     const replaceTripToForm = () => {
-      this.#tripListComponent.element.replaceChild(tripFormComponent.element, tripComponent.element);
+
       document.addEventListener('keydown', onEscKeyDown);
+
+
+
+
+
+      // for(let i = 0; i < this.#tripListComponent.element.children.length; i++) {
+      //   if (this.#tripListComponent.element.children[i].classList.contains('active')) {
+      //     this.#tripListComponent.element.children[i].remove();
+      //   }
+      // }
+
+
+
+
+
+      this.#tripListComponent.element.replaceChild(tripFormComponent.element, tripComponent.element);
+      tripFormComponent.element.classList.add('active');
     };
 
     tripComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceTripToForm);
@@ -69,5 +85,7 @@ export class TripPresenter {
     });
 
     tripFormComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceFormToTrip);
+
+    render(tripComponent, this.#tripListComponent.element);
   };
 }

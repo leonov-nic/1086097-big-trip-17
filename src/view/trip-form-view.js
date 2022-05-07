@@ -3,7 +3,7 @@ import { humanizeTripDueDateThird } from '../utils';
 import { offersOfTrip } from '../const';
 
 const createTripFormTemplate = (trip) => {
-  const {type, basePrice, destination, dateFrom, dateTo, offers} = trip;
+  const {type, basePrice, destination, dateFrom, dateTo, offers, id} = trip;
 
   const generateAllOffersOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
   const allCurrentOfTypeOffers = generateAllOffersOfTrip(offersOfTrip, trip);
@@ -29,7 +29,7 @@ const createTripFormTemplate = (trip) => {
   );
 
   return (`
-    <li class="trip-evnts__item">
+    <li class="trip-events__item" id=point${id}>
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
