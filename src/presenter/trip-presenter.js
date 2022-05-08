@@ -1,9 +1,10 @@
-import { render } from '../framework/render.js';
+import { render, replace } from '../framework/render';
 import { tripSortView } from '../view/trip-sort-view';
 import { TripListView } from '../view/trip-list-view';
 import { TripFormView } from '../view/trip-form-view';
 import { TripView } from '../view/trip-view';
 import NoTripsView from '../view/no-trips-view';
+import { isEscKeyDown } from '../utils/common';
 
 export class TripPresenter {
   #tripListComponent = new TripListView();
@@ -42,49 +43,41 @@ export class TripPresenter {
     const tripFormComponent = new TripFormView(trip);
 
     const replaceFormToTrip = () => {
-      this.#tripListComponent.element.replaceChild(tripComponent.element, tripFormComponent.element);
-      tripFormComponent.element.classList.remove('active');
+      replace(tripComponent, tripFormComponent);
+      // tripFormComponent.element.classList.remove('active');
+      // console.log(tripFormComponent.element);
     };
 
-    function onEscKeyDown (evt) {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        replaceFormToTrip();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    }
+    const onEscKeyDown = (evt) => {
+      isEscKeyDown(evt, replaceFormToTrip);
+      document.removeEventListener('keydown', onEscKeyDown);
+    };
 
     const replaceTripToForm = () => {
-
-      document.addEventListener('keydown', onEscKeyDown);
-
-
-
-
-
+      // console.log(tripFormComponent.element);
       // for(let i = 0; i < this.#tripListComponent.element.children.length; i++) {
       //   if (this.#tripListComponent.element.children[i].classList.contains('active')) {
       //     this.#tripListComponent.element.children[i].remove();
       //   }
       // }
-
-
-
-
-
-      this.#tripListComponent.element.replaceChild(tripFormComponent.element, tripComponent.element);
-      tripFormComponent.element.classList.add('active');
+      replace(tripFormComponent, tripComponent);
+      // tripFormComponent.element.classList.add('active');
     };
 
-    tripComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceTripToForm);
+    tripComponent.setToFormClickHandler(() => {
+      replaceTripToForm();
+      document.addEventListener('keydown', onEscKeyDown);
+    });
 
-    tripFormComponent.element.querySelector('form').addEventListener('submit', (evt) => {
-      evt.preventDefault();
+    tripFormComponent.setCloseFormClickHandler(() => {
       replaceFormToTrip();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    tripFormComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceFormToTrip);
+    tripFormComponent.setFormSubmitHandler(() => {
+      replaceFormToTrip();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
 
     render(tripComponent, this.#tripListComponent.element);
   };

@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { humanizeTripDueDateThird } from '../utils';
+import { humanizeTripDueFullDate } from '../utils/trip-form';
 import { offersOfTrip } from '../const';
 
 const newBlankTrip = {
@@ -11,7 +11,7 @@ const newBlankTrip = {
     name: '',
     pictures: [
       {
-        src: '',
+        src: '#',
         description: '',
       }
     ]
@@ -31,8 +31,8 @@ const createTripFormTemplate = (trip) => {
   const generateAllOffersOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
   const allCurrentOfTypeOffers = generateAllOffersOfTrip(offersOfTrip, trip);
 
-  const newDateFrom = humanizeTripDueDateThird(dateFrom);
-  const newDateTo = humanizeTripDueDateThird(dateTo);
+  const newDateFrom = humanizeTripDueFullDate(dateFrom);
+  const newDateTo = humanizeTripDueFullDate(dateTo);
 
   const currentTripOffers = Object.values(offers.offers);
 
@@ -178,4 +178,24 @@ export class TripFormView extends AbstractView {
   get template() {
     return createTripFormTemplate(this.#trip);
   }
+
+  setCloseFormClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeFormClickHandler);
+  };
+
+  #closeFormClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
+
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+  };
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
 }

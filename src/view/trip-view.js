@@ -1,13 +1,12 @@
 import AbstractView from '../framework/view/abstract-view';
-import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo } from '../utils';
-
+import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo } from '../utils/trip';
 
 const createTripTemplate = (trip) => {
   const {type, basePrice, destination, dateFrom, dateTo, isFavorite, offers} = trip;
 
-  const newDateTo = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
-  const dateStart = humanizeTripDueDateTwo(dateFrom);
-  const dateFinish = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
+  const dateFinish = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
+  const dateMonth = humanizeTripDueDateTwo(dateFrom);
+  const dateStart = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
   const durationTime = getDurationTime(dateTo, dateFrom);
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -26,16 +25,16 @@ const createTripTemplate = (trip) => {
   return (`
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="2019-03-18">${ dateStart }</time>
+        <time class="event__date" datetime="2019-03-18">${ dateMonth }</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${ type }.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${ type } ${ destination.name }</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${ dateFinish }</time>
+            <time class="event__start-time" datetime="2019-03-18T10:30">${ dateStart }</time>
             &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">${ newDateTo }</time>
+            <time class="event__end-time" datetime="2019-03-18T11:00">${ dateFinish }</time>
           </p>
           <p class="event__duration">${ durationTime }</p>
         </div>
@@ -71,4 +70,14 @@ export class TripView extends AbstractView {
   get template() {
     return createTripTemplate(this.trip);
   }
+
+  setToFormClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#toFormClickHandler);
+  };
+
+  #toFormClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

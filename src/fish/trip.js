@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomArray} from '../utils';
+import {getRandomInteger, getRandomArray} from '../utils/common';
 
 const generateDescriptionForDestination = () => {
   const descriptionForDestination = [
