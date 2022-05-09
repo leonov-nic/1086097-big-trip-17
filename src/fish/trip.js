@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomArray} from '../utils';
+import {getRandomInteger, getRandomArray} from '../utils/common';
 
 const generateDescriptionForDestination = () => {
   const descriptionForDestination = [
@@ -150,7 +150,7 @@ export const generateTrips = () => {
     dateFrom: '2019-07-10T22:55:56.845Z',
     dateTo: `2019-07-11T${getRandomInteger(10, 18)}:22:13.375Z`,
     destination: generateDestinationOfTrip(),
-    id: '0',
+    id: getRandomInteger(1, 200),
     isFavorite: getRandomInteger(0, 1),
     offers: offersOfTrip,
     type: offersOfTrip.type,

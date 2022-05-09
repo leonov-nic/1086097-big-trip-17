@@ -1,15 +1,38 @@
-import { createElement } from '../render';
-import { humanizeTripDueDateThird } from '../utils';
+import AbstractView from '../framework/view/abstract-view';
+import { humanizeTripDueFullDate } from '../utils/trip-form';
 import { offersOfTrip } from '../const';
 
+const newBlankTrip = {
+  basePrice: '',
+  dateFrom: 'null',
+  dateTo: 'null',
+  destination: {
+    description: '',
+    name: '',
+    pictures: [
+      {
+        src: '#',
+        description: '',
+      }
+    ]
+  },
+  id: '',
+  isFavorite: false,
+  offers: {
+    type: '',
+    offers: [],
+  },
+  type: '',
+};
+
 const createTripFormTemplate = (trip) => {
-  const {type, basePrice, destination, dateFrom, dateTo, offers} = trip;
+  const {type, basePrice, destination, dateFrom, dateTo, offers, id} = trip;
 
   const generateAllOffersOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
   const allCurrentOfTypeOffers = generateAllOffersOfTrip(offersOfTrip, trip);
 
-  const newDateFrom = humanizeTripDueDateThird(dateFrom);
-  const newDateTo = humanizeTripDueDateThird(dateTo);
+  const newDateFrom = humanizeTripDueFullDate(dateFrom);
+  const newDateTo = humanizeTripDueFullDate(dateTo);
 
   const currentTripOffers = Object.values(offers.offers);
 
@@ -29,7 +52,7 @@ const createTripFormTemplate = (trip) => {
   );
 
   return (`
-    <li class="trip-evnts__item">
+    <li class="trip-events__item" id=point${id}>
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
@@ -144,11 +167,11 @@ const createTripFormTemplate = (trip) => {
   `);
 };
 
-export class TripFormView {
-  #element = null;
+export class TripFormView extends AbstractView {
   #trip = null;
 
-  constructor(trip) {
+  constructor(trip = newBlankTrip) {
+    super();
     this.#trip = trip;
   }
 
@@ -156,15 +179,23 @@ export class TripFormView {
     return createTripFormTemplate(this.#trip);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setCloseFormClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeFormClickHandler);
+  };
 
-    return this.#element;
-  }
+  #closeFormClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+  };
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
 }

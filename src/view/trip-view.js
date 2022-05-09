@@ -1,16 +1,13 @@
-import { createElement } from '../render';
-import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo } from '../utils';
-
+import AbstractView from '../framework/view/abstract-view';
+import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo } from '../utils/trip';
 
 const createTripTemplate = (trip) => {
   const {type, basePrice, destination, dateFrom, dateTo, isFavorite, offers} = trip;
 
-  const newDateTo = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
-  const dateStart = humanizeTripDueDateTwo(dateFrom);
-  const newDateFrom = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
+  const dateFinish = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
+  const dateMonth = humanizeTripDueDateTwo(dateFrom);
+  const dateStart = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
   const durationTime = getDurationTime(dateTo, dateFrom);
-  const hour = Math.round(durationTime / 60);
-  const minute = (getDurationTime(dateTo, dateFrom)) - 60 * hour;
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
   const createAdditionalServices = () => (
@@ -28,18 +25,18 @@ const createTripTemplate = (trip) => {
   return (`
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="2019-03-18">${ dateStart }</time>
+        <time class="event__date" datetime="2019-03-18">${ dateMonth }</time>
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${ type }.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${ type } ${ destination.name }</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${ newDateFrom }</time>
+            <time class="event__start-time" datetime="2019-03-18T10:30">${ dateStart }</time>
             &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">${ newDateTo }</time>
+            <time class="event__end-time" datetime="2019-03-18T11:00">${ dateFinish }</time>
           </p>
-          <p class="event__duration">${hour && hour > 0 ? `${hour}H`: '' } ${ minute }M</p>
+          <p class="event__duration">${ durationTime }</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${ basePrice }</span>
@@ -62,10 +59,11 @@ const createTripTemplate = (trip) => {
   `);
 };
 
-export class TripView {
-  #element = null;
+export class TripView extends AbstractView {
+  #trip = null;
 
   constructor(trip) {
+    super();
     this.trip = trip;
   }
 
@@ -73,15 +71,13 @@ export class TripView {
     return createTripTemplate(this.trip);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setToFormClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#toFormClickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #toFormClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

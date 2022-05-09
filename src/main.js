@@ -2,8 +2,8 @@ import { TripFilterView } from './view/trip-filter-view';
 import TripInfoView from './view/trip-info-view';
 import { TripPresenter } from './presenter/trip-presenter';
 
-import { RenderPosition } from './render';
-import { render } from './render';
+import { RenderPosition } from './framework/render';
+import { render } from './framework/render';
 
 import TripsModel from './model/trips-model';
 const tripsModel = new TripsModel;
