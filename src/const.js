@@ -126,7 +126,7 @@ const offersOfTrip = [
   }
 ];
 
-const typeOfTrip = [
+const typesOfTrip = [
   'taxi',
   'bus',
   'train',
@@ -138,4 +138,4 @@ const typeOfTrip = [
   'restaurant',
 ];
 
-export { offersOfTrip, typeOfTrip };
+export { offersOfTrip, typesOfTrip };

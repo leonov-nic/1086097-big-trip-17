@@ -1,28 +1,37 @@
 import AbstractView from '../framework/view/abstract-view';
+import { filters } from '../utils/filter';
 
-const createTripFilterTemplate = () => (`
-  <form class="trip-filters" action="#" method="get">
-    <div class="trip-filters__filter">
-      <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything">
-      <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
-    </div>
+const createTripFilterTemplate = () => {
 
-    <div class="trip-filters__filter">
-      <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future">
-      <label class="trip-filters__filter-label" for="filter-future">Future</label>
-    </div>
+  const genetateFilters = () => (
+    filters ? `${Object.keys(filters).map((filterName) =>
+      `
+      <div class="trip-filters__filter">
+        <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterName}" ${filterName && filterName === 'Everything' ? 'checked' : ''}>
+        <label class="trip-filters__filter-label" for="filter-${filterName}">${filterName}</label>
+      </div>
+      `
+    ).join('')}` : ''
+  );
 
-    <div class="trip-filters__filter">
-      <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" checked>
-      <label class="trip-filters__filter-label" for="filter-past">Past</label>
-    </div>
+  return (`
+    <form class="trip-filters" action="#" method="get">
+      ${genetateFilters()}
 
-    <button class="visually-hidden" type="submit">Accept filter</button>
-  </form>
+      <button class="visually-hidden" type="submit">Accept filter</button>
+    </form>
   `);
+};
 
 export class TripFilterView extends AbstractView {
+  #trips = null;
+
+  constructor(trips) {
+    super();
+    this.#trips = trips;
+  }
+
   get template() {
-    return createTripFilterTemplate();
+    return createTripFilterTemplate(this.#trips);
   }
 }

@@ -15,8 +15,8 @@ const siteFilterContainer = siteHeaderElement.querySelector('.trip-controls__fil
 const sitePageMainElement = document.querySelector('.page-main');
 const siteTripsContainer = sitePageMainElement.querySelector('.trip-events');
 
-render(new TripInfoView(tripsModel), siteTripMainElement, RenderPosition.AFTERBEGIN);
-render(new TripFilterView, siteFilterContainer);
+render(new TripInfoView(tripsModel.trips), siteTripMainElement, RenderPosition.AFTERBEGIN);
+render(new TripFilterView(tripsModel.trips), siteFilterContainer);
 
 const tripPresenter = new TripPresenter(siteTripsContainer, tripsModel);
 tripPresenter.init();
