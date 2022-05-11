@@ -147,8 +147,8 @@ export const generateTrips = () => {
   const offersOfTrip = getOffersOfTrip();
   return ({
     basePrice: getRandomInteger(500, 1500),
-    dateFrom: '2019-07-10T22:55:56.845Z',
-    dateTo: `2019-07-11T${getRandomInteger(10, 18)}:22:13.375Z`,
+    dateFrom: `2022-0${getRandomInteger(5, 5)}-10T22:55:56.845Z`,
+    dateTo: `2022-0${getRandomInteger(5, 9)}-11T${getRandomInteger(10, 18)}:22:13.375Z`,
     destination: generateDestinationOfTrip(),
     id: getRandomInteger(1, 200),
     isFavorite: getRandomInteger(0, 1),

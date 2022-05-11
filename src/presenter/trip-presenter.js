@@ -45,7 +45,6 @@ export class TripPresenter {
     const replaceFormToTrip = () => {
       replace(tripComponent, tripFormComponent);
       // tripFormComponent.element.classList.remove('active');
-      // console.log(tripFormComponent.element);
     };
 
     const onEscKeyDown = (evt) => {
@@ -54,7 +53,6 @@ export class TripPresenter {
     };
 
     const replaceTripToForm = () => {
-      // console.log(tripFormComponent.element);
       // for(let i = 0; i < this.#tripListComponent.element.children.length; i++) {
       //   if (this.#tripListComponent.element.children[i].classList.contains('active')) {
       //     this.#tripListComponent.element.children[i].remove();
