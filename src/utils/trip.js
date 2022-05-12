@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
-
-const minMax = require('dayjs/plugin/minMax');
+import minMax from 'dayjs/plugin/minMax';
 dayjs.extend(minMax);
 
 const createPeriodOfTrips = (trips) => {
@@ -12,14 +11,7 @@ const createPeriodOfTrips = (trips) => {
 const humanizeTripDueDate = (date) => dayjs(date).format('HH:mm');
 const humanizeTripDueDateTwo = (date) => dayjs(date).format('MMM D');
 
-const getDurationTime = (dateto, datefrom) => {
-  const diffTime = dayjs(dateto).diff(dayjs(datefrom));
-  const days = dayjs(dateto).diff(dayjs(datefrom), 'd');
-  const hours = dayjs(diffTime).format('HH');
-  const minutes = dayjs(diffTime).format('mm');
-  const newDiffTime = `${days}D ${hours}H ${minutes}M`;
-  return newDiffTime;
-};
+const getDurationTime = (dateto, datefrom) => dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('DD[D] HH[H] mm[M]');
 
 const isTripExpiringToday = (datefrom) => datefrom && dayjs(datefrom).isSame(dayjs(), 'd') || datefrom && dayjs(datefrom).isAfter(dayjs(), 'd');
 
