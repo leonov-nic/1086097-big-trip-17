@@ -3,7 +3,7 @@ import { createPeriodOfTrips }  from '../utils/trip';
 
 const createTripInfoTemplate = (trips) => {
 
-  const period = createPeriodOfTrips(trips);
+  const period = trips.length ? createPeriodOfTrips(trips) : '';
 
   return (`
     <section class="trip-main__trip-info  trip-info">

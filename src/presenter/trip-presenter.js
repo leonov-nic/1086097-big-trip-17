@@ -1,82 +1,53 @@
 import { render, replace } from '../framework/render';
-import { tripSortView } from '../view/trip-sort-view';
-import { TripListView } from '../view/trip-list-view';
 import { TripFormView } from '../view/trip-form-view';
 import { TripView } from '../view/trip-view';
-import NoTripsView from '../view/no-trips-view';
 import { isEscKeyDown } from '../utils/common';
 
-export class TripPresenter {
-  #tripListComponent = new TripListView();
-  #noTripsComponent = new NoTripsView();
-  #tripContainer = null;
-  #tripsModel = null;
-  #trips = null;
+export default class TripPresenter {
+  #trip = null;
+  #tripListComponent = null;
+  #tripComponent = null;
+  #tripFormComponent = null;
 
-  constructor (tripContainer, tripsModel) {
-    this.#tripContainer = tripContainer;
-    this.#tripsModel = tripsModel;
+  constructor (trip, listComponent) {
+    this.#trip = trip;
+    this.#tripListComponent = listComponent;
+    this.#tripComponent = new TripView(trip);
+    this.#tripFormComponent = new TripFormView(trip);
   }
 
   init = () => {
-    this.#trips = [...this.#tripsModel.trips];
-    this.#renderList();
+    this.#tripComponent.setToFormClickHandler(this.#setToFormClickHandler);
+    this.#tripFormComponent.setCloseFormClickHandler(this.#setCloseFormClickHandler);
+    this.#tripFormComponent.setFormSubmitHandler(this.#setFormSubmitHandler);
+    render(this.#tripComponent, this.#tripListComponent);
   };
 
-  #renderList = () => {
-    if (this.#trips.every((trip) => trip.isThere)) {
-      render(this.#tripListComponent, this.#tripContainer);
-      render(this.#noTripsComponent, this.#tripListComponent.element);
-      return;
-    }
-
-    render(new tripSortView, this.#tripContainer);
-    render(this.#tripListComponent, this.#tripContainer);
-
-    for (let i = 0; i < this.#trips.length; i++) {
-      this.#renderTrip(this.#trips[i]);
-    }
+  #replaceFormToTrip = () => {
+    replace(this.#tripComponent, this.#tripFormComponent);
   };
 
-  #renderTrip = (trip) => {
-    const tripComponent = new TripView(trip);
-    const tripFormComponent = new TripFormView(trip);
+  #onEscKeyDown = (evt) => {
+    isEscKeyDown(evt, this.#replaceFormToTrip);
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
 
-    const replaceFormToTrip = () => {
-      replace(tripComponent, tripFormComponent);
-      // tripFormComponent.element.classList.remove('active');
-    };
+  #replaceTripToForm = () => {
+    replace(this.#tripFormComponent, this.#tripComponent);
+  };
 
-    const onEscKeyDown = (evt) => {
-      isEscKeyDown(evt, replaceFormToTrip);
-      document.removeEventListener('keydown', onEscKeyDown);
-    };
+  #setToFormClickHandler = () => {
+    this.#replaceTripToForm();
+    document.addEventListener('keydown', this.#onEscKeyDown);
+  };
 
-    const replaceTripToForm = () => {
-      // for(let i = 0; i < this.#tripListComponent.element.children.length; i++) {
-      //   if (this.#tripListComponent.element.children[i].classList.contains('active')) {
-      //     this.#tripListComponent.element.children[i].remove();
-      //   }
-      // }
-      replace(tripFormComponent, tripComponent);
-      // tripFormComponent.element.classList.add('active');
-    };
+  #setCloseFormClickHandler = () => {
+    this.#replaceFormToTrip();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
 
-    tripComponent.setToFormClickHandler(() => {
-      replaceTripToForm();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    tripFormComponent.setCloseFormClickHandler(() => {
-      replaceFormToTrip();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    tripFormComponent.setFormSubmitHandler(() => {
-      replaceFormToTrip();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    render(tripComponent, this.#tripListComponent.element);
+  #setFormSubmitHandler = () => {
+    this.#replaceFormToTrip();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 }

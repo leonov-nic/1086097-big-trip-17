@@ -143,7 +143,7 @@ const getOffersOfTrip = () => {
   return offersOfTrip[randomIndex];
 };
 
-export const generateTrips = () => {
+export const generateTrip = () => {
   const offersOfTrip = getOffersOfTrip();
   return ({
     basePrice: getRandomInteger(500, 1500),

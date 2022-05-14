@@ -5,7 +5,10 @@ dayjs.extend(minMax);
 const createPeriodOfTrips = (trips) => {
   const arrayOfDateFrom = trips.map((trip) => dayjs(trip.dateFrom));
   const arrayOfDateTo = trips.map((trip) => dayjs(trip.dateTo));
-  return `${dayjs.min([...arrayOfDateFrom]).format('MMM D')} – ${dayjs.max([...arrayOfDateTo]).format('MMM D')}`;
+
+  if (arrayOfDateFrom.length && arrayOfDateTo.length) {
+    return `${dayjs.min([...arrayOfDateFrom]).format('MMM D')} – ${dayjs.max([...arrayOfDateTo]).format('MMM D')}`;
+  }
 };
 
 const humanizeTripDueDate = (date) => dayjs(date).format('HH:mm');
