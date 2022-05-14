@@ -11,6 +11,7 @@ export class ListPresenter {
   #tripContainer = null;
   #tripsModel = null;
   #trips = null;
+  #tripPresenter = new Map();
 
   constructor (tripContainer, tripsModel) {
     this.#tripContainer = tripContainer;
@@ -52,7 +53,13 @@ export class ListPresenter {
   };
 
   #renderTrip = (trip) => {
-    const tripPresenter = new TripPresenter(trip, this.#tripListComponent.element);
-    tripPresenter.init();
+    const tripPresenter = new TripPresenter(this.#tripListComponent.element);
+    tripPresenter.init(trip);
+    this.#tripPresenter.set(trip.id, tripPresenter);
+  };
+
+  #clearList = () => {
+    this.#tripPresenter.forEach((presenter) => presenter.destroy());
+    this.#tripPresenter.clear();
   };
 }
