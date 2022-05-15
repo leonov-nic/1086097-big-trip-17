@@ -54,7 +54,7 @@ export class ListPresenter {
   };
 
   #renderTrip = (trip) => {
-    const tripPresenter = new TripPresenter(this.#tripListComponent.element, this.#handleTripChange);
+    const tripPresenter = new TripPresenter(this.#tripListComponent.element, this.#handleTripChange, this.#handleModeChange);
     tripPresenter.init(trip);
     this.#tripPresenter.set(trip.id, tripPresenter);
   };
@@ -67,5 +67,9 @@ export class ListPresenter {
   #handleTripChange = (updatedTrip) => {
     this.#trips = updateItem(this.#trips, updatedTrip);
     this.#tripPresenter.get(updatedTrip.id).init(updatedTrip);
+  };
+
+  #handleModeChange = () => {
+    this.#tripPresenter.forEach((presenter) => presenter.resetView());
   };
 }

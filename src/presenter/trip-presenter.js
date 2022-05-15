@@ -2,6 +2,7 @@ import { render, replace, remove } from '../framework/render';
 import { TripFormView } from '../view/trip-form-view';
 import { TripView } from '../view/trip-view';
 import { isEscKeyDown } from '../utils/common';
+import { Mode } from '../const';
 
 export default class TripPresenter {
   #trip = null;
@@ -9,10 +10,13 @@ export default class TripPresenter {
   #changeData = null;
   #tripComponent = null;
   #formComponent = null;
+  #changeMode = null;
+  #mode = Mode.DEFAULT;
 
-  constructor (listComponent, changeDate) {
+  constructor (listComponent, changeDate, changeMode) {
     this.#tripListComponent = listComponent;
     this.#changeData = changeDate;
+    this.#changeMode = changeMode;
   }
 
   init = (trip) => {
@@ -34,11 +38,11 @@ export default class TripPresenter {
       return;
     }
 
-    if (this.#tripListComponent.contains(prevTripComponent.element)) {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#tripComponent, prevTripComponent);
     }
 
-    if (this.#tripListComponent.contains(prevFormComponent.element)) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#formComponent, prevFormComponent);
     }
 
@@ -51,14 +55,23 @@ export default class TripPresenter {
     remove(this.#formComponent);
   };
 
+  resetView = () => {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceFormToTrip();
+    }
+  };
+
   #replaceFormToTrip = () => {
     replace(this.#tripComponent, this.#formComponent);
     document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#mode = Mode.DEFAULT;
   };
 
   #replaceTripToForm = () => {
     replace(this.#formComponent, this.#tripComponent);
     document.addEventListener('keydown', this.#onEscKeyDown);
+    this.#changeMode();
+    this.#mode = Mode.EDITING;
   };
 
   #onEscKeyDown = (evt) => {
