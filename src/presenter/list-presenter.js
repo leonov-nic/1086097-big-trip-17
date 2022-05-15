@@ -3,6 +3,7 @@ import { tripSortView } from '../view/trip-sort-view';
 import { TripListView } from '../view/trip-list-view';
 import NoTripsView from '../view/no-trips-view';
 import TripPresenter from './trip-presenter';
+import { updateItem } from '../utils/common.js';
 
 export class ListPresenter {
   #sortComponent= new tripSortView();
@@ -53,7 +54,7 @@ export class ListPresenter {
   };
 
   #renderTrip = (trip) => {
-    const tripPresenter = new TripPresenter(this.#tripListComponent.element);
+    const tripPresenter = new TripPresenter(this.#tripListComponent.element, this.#handleTripChange);
     tripPresenter.init(trip);
     this.#tripPresenter.set(trip.id, tripPresenter);
   };
@@ -61,5 +62,10 @@ export class ListPresenter {
   #clearList = () => {
     this.#tripPresenter.forEach((presenter) => presenter.destroy());
     this.#tripPresenter.clear();
+  };
+
+  #handleTripChange = (updatedTrip) => {
+    this.#trips = updateItem(this.#trips, updatedTrip);
+    this.#tripPresenter.get(updatedTrip.id).init(updatedTrip);
   };
 }

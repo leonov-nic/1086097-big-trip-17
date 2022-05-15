@@ -6,11 +6,13 @@ import { isEscKeyDown } from '../utils/common';
 export default class TripPresenter {
   #trip = null;
   #tripListComponent = null;
+  #changeData = null;
   #tripComponent = null;
   #formComponent = null;
 
-  constructor (listComponent) {
+  constructor (listComponent, changeDate) {
     this.#tripListComponent = listComponent;
+    this.#changeData = changeDate;
   }
 
   init = (trip) => {
@@ -23,8 +25,9 @@ export default class TripPresenter {
     this.#formComponent = new TripFormView(trip);
 
     this.#tripComponent.setToFormClickHandler(this.#replaceTripToForm);
+    this.#tripComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#formComponent.setCloseFormClickHandler(this.#replaceFormToTrip);
-    this.#formComponent.setFormSubmitHandler(this.#replaceFormToTrip);
+    this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
 
     if (prevTripComponent === null || prevFormComponent === null) {
       render(this.#tripComponent, this.#tripListComponent);
@@ -61,5 +64,14 @@ export default class TripPresenter {
   #onEscKeyDown = (evt) => {
     isEscKeyDown(evt, this.#replaceFormToTrip);
     document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #handleFavoriteClick = () => {
+    this.#changeData({...this.#trip, isFavorite: !this.#trip.isFavorite});
+  };
+
+  #handleFormSubmit = (trip) => {
+    this.#changeData(trip);
+    this.#replaceFormToTrip();
   };
 }
