@@ -1,7 +1,6 @@
 import AbstractView from '../framework/view/abstract-view';
 import { humanizeTripDueFullDate } from '../utils/trip-form';
-import { offersOfTrip } from '../const';
-import { typesOfTrip } from '../const';
+import { offersOfTrip, typesOfTrip } from '../const';
 
 const newBlankTrip = {
   basePrice: '',
@@ -165,6 +164,6 @@ export class TripFormView extends AbstractView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this.#trip);
   };
 }

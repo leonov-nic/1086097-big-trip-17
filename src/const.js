@@ -1,3 +1,8 @@
+const Mode = {
+  DEFAULT: 'default',
+  EDITING: 'editing',
+};
+
 const offersOfTrip = [
   {
     type: 'taxi',
@@ -138,4 +143,4 @@ const typesOfTrip = [
   'restaurant',
 ];
 
-export { offersOfTrip, typesOfTrip };
+export { offersOfTrip, typesOfTrip, Mode };
