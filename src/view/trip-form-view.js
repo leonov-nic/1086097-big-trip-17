@@ -27,9 +27,11 @@ const newBlankTrip = {
 };
 
 const createTripFormTemplate = (trip) => {
-  const {type, basePrice, dateFrom, dateTo, offers, id, currentType, noChecked, currentNameDestination } = trip;
+  const {type, basePrice, dateFrom, dateTo, offers, id, noCheckedOffer, destination} = trip;
 
-  const currentOffers = generateAllOffersOfTrip(offersOfTrip, currentType);
+  // console.log(noCheckedOffer);
+
+  const currentOffers = generateAllOffersOfTrip(offersOfTrip, type);
 
   const newDateFrom = humanizeTripDueFullDate(dateFrom);
   const newDateTo = humanizeTripDueFullDate(dateTo);
@@ -50,14 +52,14 @@ const createTripFormTemplate = (trip) => {
   );
 
   const createPicturesOfTrip = () => (
-    getDestinationByName(descriptionOfTrip, currentNameDestination).pictures.map((item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}">`)).join(' ')
+    getDestinationByName(descriptionOfTrip, destination.name).pictures.map((item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}">`)).join(' ')
   );
 
   const createOffersOfTrip = () => (
     currentOffers.offers.map((offer) => {
       let checked = currentTripOffers.some((item) => item.id === offer.id);
 
-      if (noChecked) {
+      if (noCheckedOffer) {
         checked = false;
       }
 
@@ -94,9 +96,9 @@ const createTripFormTemplate = (trip) => {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-${id}">
-              ${currentType}
+              ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination${id}" value="${currentNameDestination}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination${id}" value="${destination.name}" list="destination-list-1">
             <datalist id="destination-list-1">
               <option value="Amsterdam"></option>
               <option value="Geneva"></option>
@@ -136,8 +138,8 @@ const createTripFormTemplate = (trip) => {
           </section>
 
           <section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">${getDestinationByName(descriptionOfTrip, currentNameDestination).name}</h3>
-            <p class="event__destination-description">${getDestinationByName(descriptionOfTrip, currentNameDestination).description}</p>
+            <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
+            <p class="event__destination-description">${destination.description}</p>
             <div class="event__photos-container">
 
             <div class="event__photos-tape">
@@ -157,53 +159,53 @@ export class TripFormView extends AbstractStatefulView {
     super();
 
     this._state = TripFormView.parseTripToState(trip);
-    this.element.querySelector('.event__type-list').addEventListener('click', this.#typeChangeHandler);
-    this.element.querySelector('.event__field-group--destination').addEventListener('change', this.#placeChangeHandler);
+    this.#setInnerHandlers();
   }
+
+  reset = (trip) => {
+    this.updateElement(
+      TripFormView.parseTripToState(trip),
+    );
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCloseFormClickHandler(this._callback.click);
+  };
 
   get template() {
     return createTripFormTemplate(this._state);
   }
 
   #placeChangeHandler = (evt) => {
-    evt.preventDefault();
-
-    this.updateElement({
-      currentNameDestination: evt.target.value,
-
-    });
+    if (descriptionOfTrip.some((element) => element.name === evt.target.value)) {
+      this.updateElement({
+        destination: getDestinationByName(descriptionOfTrip, evt.target.value)
+      });
+    }
   };
 
   #typeChangeHandler = (evt) => {
     evt.preventDefault();
 
+    this._setState({
+      type: evt.target.textContent,
+    });
+    // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
     this.updateElement({
-      currentType: evt.target.textContent,
-      noChecked: true,
+      noCheckedOffer: true,
     });
   };
 
   static parseTripToState = (trip) => ({...trip,
-    currentType: trip.type,
-    currentNameDestination: trip.destination.name,
-    noChecked: false,
+    noCheckedOffer: false,
   });
 
   static parseStateToTask = (state) => {
     const trip = {...state};
 
-    if (!trip.currentType) {
-      trip.type = '';
-    }
-
-    if (!trip.currentNameDestination) {
-      trip.destination.name =  '';
-    }
-
-
-    delete trip.currentType;
-    delete trip.noChecked;
-    delete trip.currentNameDestination;
+    delete trip.noCheckedOffer;
 
     return trip;
   };
@@ -226,5 +228,11 @@ export class TripFormView extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this._callback.formSubmit(TripFormView.parseStateToTask(this._state));
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#typeChangeHandler);
+    // if (typeof this._state.destination !=='undefined') {}
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#placeChangeHandler);
   };
 }
