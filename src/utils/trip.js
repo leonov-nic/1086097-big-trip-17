@@ -11,6 +11,14 @@ const createPeriodOfTrips = (trips) => {
   }
 };
 
+const generateAllOffersOfTrip = ((offers, type) => offers.find((item) => item.type === type));
+
+const getDestinationByName = ((destinations, name) => destinations.find((item) => {
+  const df = destinations.some((element) => element.name === name)
+  if (!df) return 'Geneva';
+  return item.name === name
+}));
+
 const humanizeTripDueDate = (date) => dayjs(date).format('HH:mm');
 const humanizeTripDueDateTwo = (date) => dayjs(date).format('MMM D');
 
@@ -43,4 +51,15 @@ const isTripExpiringToday = (datefrom) => datefrom && dayjs(datefrom).isSame(day
 
 const isTripOverdue = (dateto) => dateto && dayjs(dateto).isBefore(dayjs(), 'd');
 
-export { humanizeTripDueDate, humanizeTripDueDateTwo, getDurationTime, isTripExpiringToday, isTripOverdue, createPeriodOfTrips, sortTripByPrice, sortTripByTime };
+export {
+  humanizeTripDueDate,
+  humanizeTripDueDateTwo,
+  getDurationTime,
+  isTripExpiringToday,
+  isTripOverdue,
+  createPeriodOfTrips,
+  sortTripByPrice,
+  sortTripByTime,
+  generateAllOffersOfTrip,
+  getDestinationByName
+};

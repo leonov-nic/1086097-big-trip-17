@@ -1,6 +1,8 @@
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTripDueFullDate } from '../utils/trip-form';
+import { generateAllOffersOfTrip, getDestinationByName } from '../utils/trip';
 import { offersOfTrip, typesOfTrip } from '../const';
+import {descriptionOfTrip} from '../const';
 
 const newBlankTrip = {
   basePrice: '',
@@ -17,7 +19,6 @@ const newBlankTrip = {
     ]
   },
   id: '',
-  isFavorite: false,
   offers: {
     type: '',
     offers: [],
@@ -26,10 +27,11 @@ const newBlankTrip = {
 };
 
 const createTripFormTemplate = (trip) => {
-  const {type, basePrice, destination, dateFrom, dateTo, offers, id} = trip;
+  const {type, basePrice, dateFrom, dateTo, offers, id, noCheckedOffer, destination} = trip;
 
-  const generateAllOffersOfTrip = ((typesoftrip, offerstrip) => typesoftrip.find((item) => item.type === offerstrip.type));
-  const allCurrentOfTypeOffers = generateAllOffersOfTrip(offersOfTrip, trip);
+  // console.log(noCheckedOffer);
+
+  const currentOffers = generateAllOffersOfTrip(offersOfTrip, type);
 
   const newDateFrom = humanizeTripDueFullDate(dateFrom);
   const newDateTo = humanizeTripDueFullDate(dateTo);
@@ -38,6 +40,7 @@ const createTripFormTemplate = (trip) => {
 
   const createTypesOfTrip = () => (
     typesOfTrip.map((itemType) => {
+
       const checked = itemType === type;
       return (`
         <div class="event__type-item">
@@ -48,9 +51,18 @@ const createTripFormTemplate = (trip) => {
     }).join('\n')
   );
 
+  const createPicturesOfTrip = () => (
+    getDestinationByName(descriptionOfTrip, destination.name).pictures.map((item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}">`)).join(' ')
+  );
+
   const createOffersOfTrip = () => (
-    allCurrentOfTypeOffers.offers.map((offer) => {
-      const checked = currentTripOffers.some((item) => item.id === offer.id);
+    currentOffers.offers.map((offer) => {
+      let checked = currentTripOffers.some((item) => item.id === offer.id);
+
+      if (noCheckedOffer) {
+        checked = false;
+      }
+
       return (`
         <div class="event__offer-selector">
           <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${offer.id}" type="checkbox" name="event-offer-luggage" ${checked ? 'checked' : ''}>
@@ -128,6 +140,12 @@ const createTripFormTemplate = (trip) => {
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
             <p class="event__destination-description">${destination.description}</p>
+            <div class="event__photos-container">
+
+            <div class="event__photos-tape">
+              ${createPicturesOfTrip()}
+            </div>
+          </div>
           </section>
         </section>
       </form>
@@ -135,17 +153,62 @@ const createTripFormTemplate = (trip) => {
   `);
 };
 
-export class TripFormView extends AbstractView {
-  #trip = null;
+export class TripFormView extends AbstractStatefulView {
 
   constructor(trip = newBlankTrip) {
     super();
-    this.#trip = trip;
+
+    this._state = TripFormView.parseTripToState(trip);
+    this.#setInnerHandlers();
   }
 
+  reset = (trip) => {
+    this.updateElement(
+      TripFormView.parseTripToState(trip),
+    );
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCloseFormClickHandler(this._callback.click);
+  };
+
   get template() {
-    return createTripFormTemplate(this.#trip);
+    return createTripFormTemplate(this._state);
   }
+
+  #placeChangeHandler = (evt) => {
+    if (descriptionOfTrip.some((element) => element.name === evt.target.value)) {
+      this.updateElement({
+        destination: getDestinationByName(descriptionOfTrip, evt.target.value)
+      });
+    }
+  };
+
+  #typeChangeHandler = (evt) => {
+    evt.preventDefault();
+
+    this._setState({
+      type: evt.target.textContent,
+    });
+    // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
+    this.updateElement({
+      noCheckedOffer: true,
+    });
+  };
+
+  static parseTripToState = (trip) => ({...trip,
+    noCheckedOffer: false,
+  });
+
+  static parseStateToTask = (state) => {
+    const trip = {...state};
+
+    delete trip.noCheckedOffer;
+
+    return trip;
+  };
 
   setCloseFormClickHandler = (callback) => {
     this._callback.click = callback;
@@ -164,6 +227,12 @@ export class TripFormView extends AbstractView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit(this.#trip);
+    this._callback.formSubmit(TripFormView.parseStateToTask(this._state));
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#typeChangeHandler);
+    // if (typeof this._state.destination !=='undefined') {}
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#placeChangeHandler);
   };
 }

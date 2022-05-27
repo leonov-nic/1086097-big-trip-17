@@ -57,12 +57,15 @@ export default class TripPresenter {
 
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#formComponent.reset(this.#trip);
       this.#replaceFormToTrip();
     }
   };
 
   #replaceFormToTrip = () => {
+    this.#formComponent.reset(this.#trip);
     replace(this.#tripComponent, this.#formComponent);
+
     document.removeEventListener('keydown', this.#onEscKeyDown);
     this.#mode = Mode.DEFAULT;
   };
