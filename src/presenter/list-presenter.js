@@ -1,26 +1,40 @@
-import { render } from '../framework/render';
+import { render, RenderPosition } from '../framework/render';
 import { tripSortView } from '../view/trip-sort-view';
 import { TripListView } from '../view/trip-list-view';
 import NoTripsView from '../view/no-trips-view';
 import TripPresenter from './trip-presenter';
 import { updateItem } from '../utils/common.js';
+import { SortType } from '../const.js';
+import { sortTripByPrice, sortTripByTime } from '../utils/trip';
+
+import TripInfoView from '../view/trip-info-view';
+import { TripFilterView } from '../view/trip-filter-view';
+import TripsModel from '../model/trips-model';
 
 export class ListPresenter {
-  #sortComponent= new tripSortView();
+  #sortComponent = new tripSortView();
   #noTripsComponent = new NoTripsView();
   #tripListComponent = new TripListView();
   #tripContainer = null;
-  #tripsModel = null;
+  #filterContainer = null;
+  #mainContainer = null;
+  #tripsModel = new TripsModel;
   #trips = null;
+  #currentSortType = SortType.DEFAULT;
+  #sortedTrips = [];
   #tripPresenter = new Map();
 
-  constructor (tripContainer, tripsModel) {
+  constructor (tripContainer, filterContainer, mainContainer) {
     this.#tripContainer = tripContainer;
-    this.#tripsModel = tripsModel;
+    this.#filterContainer = filterContainer;
+    this.#mainContainer = mainContainer;
   }
 
   init = () => {
     this.#trips = [...this.#tripsModel.trips];
+    this.#sortedTrips = [...this.#tripsModel.trips];
+    render(new TripInfoView(this.#trips), this.#mainContainer, RenderPosition.AFTERBEGIN);
+    render(new TripFilterView(this.#trips), this.#filterContainer);
     this.#renderListOfTrips();
   };
 
@@ -35,7 +49,29 @@ export class ListPresenter {
   };
 
   #renderSort = () => {
+    this.#sortComponent.setSortTypeClickHandler(this.#handleSortTypeChange);
     render(this.#sortComponent, this.#tripContainer);
+  };
+
+  #sortTrip = (type) => {
+    switch (type) {
+      case SortType.TIME:
+        this.#sortedTrips.sort(sortTripByTime);
+        break;
+      case SortType.PRICE:
+        this.#sortedTrips.sort(sortTripByPrice);
+        break;
+      default:
+        this.#sortedTrips = [...this.#trips];
+    }
+    this.#currentSortType = type;
+  };
+
+  #handleSortTypeChange = (type) => {
+    if (this.#currentSortType === type) { return;}
+    this.#sortTrip(type);
+    this.#clearList();
+    this.#renderListOfTrips();
   };
 
   #renderNoTrips = () => {

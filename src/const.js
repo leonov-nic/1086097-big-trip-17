@@ -3,6 +3,12 @@ const Mode = {
   EDITING: 'editing',
 };
 
+const SortType = {
+  DEFAULT: 'default',
+  TIME: 'time',
+  PRICE: 'price',
+};
+
 const offersOfTrip = [
   {
     type: 'taxi',
@@ -143,4 +149,4 @@ const typesOfTrip = [
   'restaurant',
 ];
 
-export { offersOfTrip, typesOfTrip, Mode };
+export { offersOfTrip, typesOfTrip, Mode, SortType };
