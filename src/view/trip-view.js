@@ -8,6 +8,7 @@ const createTripTemplate = (trip) => {
   const dateMonth = humanizeTripDueDateTwo(dateFrom);
   const dateStart = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
   const durationTime = getDurationTime(dateTo, dateFrom);
+
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
   const createAdditionalServices = () => (

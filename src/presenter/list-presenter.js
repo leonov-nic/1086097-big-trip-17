@@ -9,7 +9,7 @@ import { sortTripByPrice, sortTripByTime } from '../utils/trip';
 
 import TripInfoView from '../view/trip-info-view';
 import { TripFilterView } from '../view/trip-filter-view';
-import TripsModel from '../model/trips-model';
+
 
 export class ListPresenter {
   #sortComponent = new tripSortView();
@@ -18,13 +18,14 @@ export class ListPresenter {
   #tripContainer = null;
   #filterContainer = null;
   #mainContainer = null;
-  #tripsModel = new TripsModel;
+  #tripsModel = null;
   #trips = null;
   #currentSortType = SortType.DEFAULT;
   #sortedTrips = [];
   #tripPresenter = new Map();
 
-  constructor (tripContainer, filterContainer, mainContainer) {
+  constructor (tripContainer, filterContainer, mainContainer, tripsModel) {
+    this.#tripsModel = tripsModel;
     this.#tripContainer = tripContainer;
     this.#filterContainer = filterContainer;
     this.#mainContainer = mainContainer;
@@ -37,6 +38,10 @@ export class ListPresenter {
     render(new TripFilterView(this.#trips), this.#filterContainer);
     this.#renderListOfTrips();
   };
+
+  get trips() {
+    return this.#tripsModel.tasks;
+  }
 
   #renderListOfTrips = () => {
     if (this.#trips.every((trip) => trip.isThere)) {
