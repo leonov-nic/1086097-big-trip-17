@@ -8,7 +8,7 @@ const createTripFilterTemplate = () => {
       `
       <div class="trip-filters__filter">
         <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterName}" ${filterName && filterName === 'Everything' ? 'checked' : ''}>
-        <label class="trip-filters__filter-label" for="filter-${filterName}">${filterName}</label>
+        <label class="trip-filters__filter-label" for="filter-${filterName}" data-filter="${filterName}">${filterName}</label>
       </div>
       `
     ).join('')}` : ''
@@ -34,4 +34,15 @@ export class TripFilterView extends AbstractView {
   get template() {
     return createTripFilterTemplate(this.#trips);
   }
+
+  setFilterTypeClickHandler = (callback) => {
+    this._callback.selectFilterType = callback;
+    this.element.addEventListener('click', this.#filterTypeClickHandler);
+  };
+
+  #filterTypeClickHandler = (evt) => {
+    if (evt.target.tagName !== 'LABEL') { return; }
+    evt.preventDefault();
+    this._callback.selectFilterType(evt.target.dataset.filter);
+  };
 }

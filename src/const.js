@@ -11,6 +11,18 @@ const SortType = {
   PRICE: 'price',
 };
 
+const UserAction = {
+  UPDATE_TRIP: 'UPDATE_TRIP',
+  ADD_TRIP: 'ADD_TRIP',
+  DELETE_TRIP: 'DELETE_TRIP',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
 const offersOfTrip = [
   {
     type: 'taxi',
@@ -244,4 +256,4 @@ const descriptionOfTrip = [
   },
 ];
 
-export { offersOfTrip, typesOfTrip, Mode, SortType, descriptionOfTrip};
+export { offersOfTrip, typesOfTrip, Mode, SortType, descriptionOfTrip, UpdateType, UserAction };

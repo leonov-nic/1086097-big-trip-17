@@ -2,7 +2,10 @@ import { render, replace, remove } from '../framework/render';
 import { TripFormView } from '../view/trip-form-view';
 import { TripView } from '../view/trip-view';
 import { isEscKeyDown } from '../utils/common';
+
 import { Mode } from '../const';
+
+import {UserAction, UpdateType} from '../const.js';
 
 export default class TripPresenter {
   #trip = null;
@@ -83,11 +86,11 @@ export default class TripPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#trip, isFavorite: !this.#trip.isFavorite});
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.PATCH, {...this.#trip, isFavorite: !this.#trip.isFavorite});
   };
 
   #handleFormSubmit = (trip) => {
-    this.#changeData(trip);
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.PATCH, trip);
     this.#replaceFormToTrip();
   };
 }
