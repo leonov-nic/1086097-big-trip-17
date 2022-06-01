@@ -12,6 +12,7 @@ import { TripFilterView } from '../view/trip-filter-view';
 
 export class ListPresenter {
   #sortComponent = null;
+  #infoComponent = null;
 
   #filterComponent = new TripFilterView();
   #noTripsComponent = new NoTripsView();
@@ -36,7 +37,6 @@ export class ListPresenter {
   init = () => {
     // this.#trips = [...this.#tripsModel.trips];
     // this.#sortedTrips = [...this.#tripsModel.trips];
-    render(new TripInfoView(this.#tripsModel.trips), this.#mainContainer, RenderPosition.AFTERBEGIN);
     render(new TripFilterView(...this.#tripsModel.trips), this.#filterContainer);
     this.#renderListOfTrips();
   };
@@ -59,6 +59,9 @@ export class ListPresenter {
       this.#renderNoTrips();
       return;
     }
+
+    this.#infoComponent = new TripInfoView(this.#tripsModel.trips);
+    render(this.#infoComponent, this.#mainContainer, RenderPosition.AFTERBEGIN);
 
     this.#renderSort();
     this.#renderList();
@@ -99,7 +102,7 @@ export class ListPresenter {
     switch (updateType) {
       case UpdateType.PATCH:
         // - обновить часть списка (например, когда поменялось описание)
-        this.#tripPresenter.get(updatedTrip.id).init(updatedTrip);
+          this.#tripPresenter.get(updatedTrip.id).init(updatedTrip);
         break;
       case UpdateType.MINOR:
         this.#clearList();
@@ -119,7 +122,6 @@ export class ListPresenter {
     // - обновить всю доску (например, при переключении фильтра)
   };
 
-
   #handleFilterTypeChange = (filter) => {
     console.log(filter);
 
@@ -128,11 +130,9 @@ export class ListPresenter {
   };
 
   #handleSortTypeChange = (type) => {
-    if (this.#currentSortType === type) { return;}
+    if (this.#currentSortType === type) {return;}
     this.#currentSortType = type;
-    // this.#sortTrip(type);
-    this.#clearList();
-    this.#renderListOfTrips();
+    this.#handleModelEvent(UpdateType.MINOR);
   };
 
   #renderNoTrips = () => {
@@ -151,7 +151,6 @@ export class ListPresenter {
   };
 
   #renderTrip = (trip) => {
-    // const tripPresenter = new TripPresenter(this.#tripListComponent.element, this.#handleTripChange, this.#handleModeChange);
     const tripPresenter = new TripPresenter(this.#tripListComponent.element, this.#handleViewAction, this.#handleModeChange);
 
     tripPresenter.init(trip);
@@ -164,6 +163,7 @@ export class ListPresenter {
 
     remove(this.#sortComponent);
     remove(this.#noTripsComponent);
+    remove(this.#infoComponent);
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;

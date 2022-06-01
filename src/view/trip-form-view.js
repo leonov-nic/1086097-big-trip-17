@@ -37,7 +37,7 @@ const createTripFormTemplate = (trip) => {
   const newDateTo = humanizeTripDueFullDate(dateTo);
 
   const currentTripOffers = Object.values(offers.offers);
-
+  // console.log(offers.offers);
 
   const createTypesOfTrip = () => (
     typesOfTrip.map((itemType) => {
@@ -61,7 +61,7 @@ const createTripFormTemplate = (trip) => {
       const checked = currentTripOffers.some((item) => item.id === offer.id);
 
       return (`
-        <div class="event__offer-selector">
+        <div class="event__offer-selector" data-offer="${offer.title}">
           <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${offer.id}" type="checkbox" name="event-offer-luggage" ${checked ? 'checked' : ''}>
           <label class="event__offer-label" for="event-offer-luggage-${offer.id}">
             <span class="event__offer-title">${offer.title}</span>
@@ -120,7 +120,7 @@ const createTripFormTemplate = (trip) => {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__reset-btn" type="reset">Delete</button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
@@ -183,9 +183,12 @@ export class TripFormView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseFormClickHandler(this._callback.click);
+    this.setDeleteFormClickHandler(this._callback.deleteFormClick);
 
     this.#setDatepickerTo();
     this.#setDatepickerFrom();
+
+    this.setAddDeleteOffers();
   };
 
   get template() {
@@ -198,27 +201,29 @@ export class TripFormView extends AbstractStatefulView {
         destination: getDestinationByName(descriptionOfTrip, evt.target.value)
       });
     }
+
+    this.updateElement({
+      offers: {...this._state.offers, offers: []},
+
+    });
   };
 
   #typeChangeHandler = (evt) => {
     evt.preventDefault();
 
-    this._setState({
+    this.updateElement({
       type: evt.target.textContent,
     });
+
     // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
-    this.updateElement({
-      offers: {...this._state.offers, offers: []},
-    });
   };
 
   static parseTripToState = (trip) => ({...trip,
     // noCheckedOffer: false,
   });
 
-  static parseStateToTask = (state) => {
+  static parseStateToTrip = (state) => {
     const trip = {...state};
-
     return trip;
   };
 
@@ -239,7 +244,7 @@ export class TripFormView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit(TripFormView.parseStateToTask(this._state));
+    this._callback.formSubmit(TripFormView.parseStateToTrip(this._state));
   };
 
   #setInnerHandlers = () => {
@@ -272,6 +277,37 @@ export class TripFormView extends AbstractStatefulView {
       this.#datepicker = flatpickr(this.element.querySelector('input[name="event-end-time"]'),
         {dateFormat: 'y/m/d H:i', defaultDate: this._state.dateTo, onChange: this.#dateToChangeHandler, enableTime: true,},
       );
+    }
+  };
+
+  setDeleteFormClickHandler = (callback) => {
+    this._callback.deleteFormClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
+  };
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteFormClick(TripFormView.parseStateToTrip(this._state));
+  };
+
+  setAddDeleteOffers = () => {
+    this.element.querySelector('.event__available-offers').addEventListener('change', this.#changeOffersOfTripHandler);
+  };
+
+  #changeOffersOfTripHandler = (evt) => {
+    const nameOffer = evt.target.closest('.event__offer-selector').dataset.offer;
+    const currentOffers = generateAllOffersOfTrip(offersOfTrip, this._state.type);
+
+    const newOffer = currentOffers.offers.filter((item) => item.title === nameOffer);
+
+    if (!this._state.offers.offers.some((item) => item.title === nameOffer)) {
+      this.updateElement({
+        offers: {...this._state.offers, offers: [...this._state.offers.offers, ...newOffer]},
+      });
+    } else {
+      this.updateElement({
+        offers: {...this._state.offers, offers: [...this._state.offers.offers.filter((item) => item.title !== nameOffer)]},
+      });
     }
   };
 }
