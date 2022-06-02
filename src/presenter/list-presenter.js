@@ -3,52 +3,62 @@ import { tripSortView } from '../view/trip-sort-view';
 import { TripListView } from '../view/trip-list-view';
 import NoTripsView from '../view/no-trips-view';
 import TripPresenter from './trip-presenter';
-// import { updateItem } from '../utils/common.js';
-import { SortType, UpdateType, UserAction } from '../const.js';
+
+import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
 import { sortTripByPrice, sortTripByTime } from '../utils/trip';
 
 import TripInfoView from '../view/trip-info-view';
-import { TripFilterView } from '../view/trip-filter-view';
+import FilterPresenter from '../presenter/filter-presenter';
+import {filter} from '../utils/filter';
 
 export class ListPresenter {
   #sortComponent = null;
   #infoComponent = null;
 
-  #filterComponent = new TripFilterView();
-  #noTripsComponent = new NoTripsView();
   #tripListComponent = new TripListView();
   #tripContainer = null;
   #filterContainer = null;
   #mainContainer = null;
   #tripsModel = null;
-  // #trips = null;
+  #filterModel = null;
+
+  #noTripsComponent = null;
+
   #currentSortType = SortType.DEFAULT;
-  // #sortedTrips = [];
+  #filterType = FilterType.EVERYTHING;
+
   #tripPresenter = new Map();
 
-  constructor (tripContainer, filterContainer, mainContainer, tripsModel) {
+  constructor (tripContainer, filterContainer, mainContainer, tripsModel, filterModel) {
     this.#tripsModel = tripsModel;
+    this.#filterModel = filterModel;
+
     this.#tripContainer = tripContainer;
     this.#filterContainer = filterContainer;
     this.#mainContainer = mainContainer;
+
     this.#tripsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init = () => {
-    // this.#trips = [...this.#tripsModel.trips];
-    // this.#sortedTrips = [...this.#tripsModel.trips];
-    render(new TripFilterView(...this.#tripsModel.trips), this.#filterContainer);
+    const filterPresenter = new FilterPresenter(this.#filterContainer, this.#filterModel);
+    filterPresenter.init();
     this.#renderListOfTrips();
   };
 
   get trips() {
+    this.#filterType = this.#filterModel.filter;
+    const trips = this.#tripsModel.trips;
+    const filteredTrips = filter[this.#filterType](trips);
+
     switch (this.#currentSortType) {
       case SortType.TIME:
-        return [...this.#tripsModel.trips].sort(sortTripByTime);
+        return filteredTrips.sort(sortTripByTime);
       case SortType.PRICE:
-        return [...this.#tripsModel.trips].sort(sortTripByPrice);
+        return filteredTrips.sort(sortTripByPrice);
     }
-    return this.#tripsModel.trips;
+    return filteredTrips;
   }
 
   #renderListOfTrips = () => {
@@ -74,11 +84,6 @@ export class ListPresenter {
     render(this.#sortComponent, this.#tripContainer);
   };
 
-  #renderFilter = () => {
-    this.#filterComponent.setFilterTypeClickHandler(this.#handleFilterTypeChange);
-
-  };
-
   #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_TRIP:
@@ -91,18 +96,14 @@ export class ListPresenter {
         this.#tripsModel.deleteTrip(updateType, update);
         break;
     }
-
     // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
   };
 
   #handleModelEvent = (updateType, updatedTrip) => {
     switch (updateType) {
       case UpdateType.PATCH:
         // - обновить часть списка (например, когда поменялось описание)
-          this.#tripPresenter.get(updatedTrip.id).init(updatedTrip);
+        this.#tripPresenter.get(updatedTrip.id).init(updatedTrip);
         break;
       case UpdateType.MINOR:
         this.#clearList();
@@ -115,18 +116,10 @@ export class ListPresenter {
         // - обновить всю доску (например, при переключении фильтра)
         break;
     }
-
     // В зависимости от типа изменений решаем, что делать:
     // - обновить часть списка (например, когда поменялось описание)
     // - обновить список (например, когда задача ушла в архив)
     // - обновить всю доску (например, при переключении фильтра)
-  };
-
-  #handleFilterTypeChange = (filter) => {
-    console.log(filter);
-
-    this.#clearList();
-    this.#renderListOfTrips();
   };
 
   #handleSortTypeChange = (type) => {
@@ -136,6 +129,7 @@ export class ListPresenter {
   };
 
   #renderNoTrips = () => {
+    this.#noTripsComponent = new NoTripsView(this.#filterType);
     this.#renderList();
     render(this.#noTripsComponent, this.#tripListComponent.element);
   };

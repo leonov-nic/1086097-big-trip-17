@@ -2,6 +2,9 @@ import dayjs from 'dayjs';
 import minMax from 'dayjs/plugin/minMax';
 dayjs.extend(minMax);
 
+// import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+// dayjs.extend(isSameOrBefore);
+
 const createPeriodOfTrips = (trips) => {
   const arrayOfDateFrom = trips.map((trip) => dayjs(trip.dateFrom));
   const arrayOfDateTo = trips.map((trip) => dayjs(trip.dateTo));
@@ -46,8 +49,8 @@ const sortTripByTime = (tripA, tripB) => {
 };
 
 const isTripExpiringToday = (datefrom) => datefrom && dayjs(datefrom).isSame(dayjs(), 'd') || datefrom && dayjs(datefrom).isAfter(dayjs(), 'd');
-
 const isTripOverdue = (dateto) => dateto && dayjs(dateto).isBefore(dayjs(), 'd');
+// const isTripOverdue = (dateto) => dateto && dayjs(dateto).isSameOrBefore(dayjs(), 'd');
 
 export {
   humanizeTripDueDate,
