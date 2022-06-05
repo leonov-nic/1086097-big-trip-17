@@ -56,7 +56,7 @@ const createTripFormTemplate = (trip, newForm) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="${type ? `Event ${type} icon` : ''}">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -105,7 +105,7 @@ const createTripFormTemplate = (trip, newForm) => {
 
         <section class="event__details">
           <section class="event__section  event__section--offers">
-            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+            <h3 class="event__section-title  event__section-title--offers">${currentOffers.offers ? 'Offers' : ''}</h3>
             <div class="event__available-offers">
               ${createOffersOfTrip()}
             </div>
@@ -129,7 +129,7 @@ const createTripFormTemplate = (trip, newForm) => {
 
 export class TripFormView extends AbstractStatefulView {
   #datepicker = null;
-  _newForm = null;
+  _newForm = false;
   constructor(trip, newForm = false) {
     super();
     this._newForm = newForm;
@@ -198,15 +198,18 @@ export class TripFormView extends AbstractStatefulView {
     // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
   };
 
-  static parseTripToState = (trip) => {
-    if (!this._newForm) {
-      return {...trip, };
-    } else {
-      return {...trip, dateFrom: '', dateTo: ''};
-    }
+  #priceChangeHandler = (evt) => {
+    evt.preventDefault();
 
-    // noCheckedOffer: false,
+    this._setState({
+      basePrice: evt.target.value,
+    });
   };
+
+  static parseTripToState = (trip) => (
+    {...trip, }
+    // noCheckedOffer: false,
+  );
 
   static parseStateToTrip = (state) => {
     const trip = {...state};
@@ -236,6 +239,7 @@ export class TripFormView extends AbstractStatefulView {
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#typeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#placeChangeHandler);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceChangeHandler);
   };
 
   #dateToChangeHandler = ([userDate]) => {

@@ -5,10 +5,12 @@ import { TripFormView } from '../view/trip-form-view';
 // import { Mode } from '../const';
 import {UserAction, UpdateType} from '../const.js';
 
+const currentDate = new Date;
+
 const newBlankTrip = {
   basePrice: '',
-  dateFrom: 'Sun Jun 05 2022 12:47:38 GMT+0300 (GMT+03:00) ',
-  dateTo: 'Sun Jun 05 2022 15:47:38 GMT+0300 (GMT+03:00) ',
+  dateFrom: `${currentDate}`,
+  dateTo: `${currentDate}`,
   destination: {
     description: '',
     name: '',
