@@ -24,7 +24,7 @@ export default class FilterPresenter {
       {
         type: FilterType.FUTURE,
         name: 'Future',
-         },
+      },
       {
         type: FilterType.PAST,
         name: 'Past',

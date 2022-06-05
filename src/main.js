@@ -8,5 +8,5 @@ const siteFilterContainer = siteHeaderElement.querySelector('.trip-controls__fil
 const sitePageMainElement = document.querySelector('.page-main');
 const siteTripsContainer = sitePageMainElement.querySelector('.trip-events');
 
-const tripPresenter = new ListPresenter(siteTripsContainer, siteFilterContainer, tripMainElement, new TripsModel, new FilterModel);
-tripPresenter.init();
+const listPresenter = new ListPresenter(siteTripsContainer, siteFilterContainer, tripMainElement, new TripsModel, new FilterModel);
+listPresenter.init();

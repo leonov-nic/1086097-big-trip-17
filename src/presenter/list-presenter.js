@@ -11,7 +11,12 @@ import TripInfoView from '../view/trip-info-view';
 import FilterPresenter from '../presenter/filter-presenter';
 import {filter} from '../utils/filter';
 
+import NewTripPresenter from './trip-new-presenter.js';
+import NewEventButtonView from '../view/new-event-button-view';
+
+
 export class ListPresenter {
+  #newEventButtonViewComponent = null;
   #sortComponent = null;
   #infoComponent = null;
 
@@ -29,6 +34,8 @@ export class ListPresenter {
 
   #tripPresenter = new Map();
 
+  #tripNewPresenter = null;
+
   constructor (tripContainer, filterContainer, mainContainer, tripsModel, filterModel) {
     this.#tripsModel = tripsModel;
     this.#filterModel = filterModel;
@@ -39,12 +46,15 @@ export class ListPresenter {
 
     this.#tripsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+
+    this.#tripNewPresenter = new NewTripPresenter(this.#tripListComponent.element, this.#handleViewAction);
   }
 
   init = () => {
     const filterPresenter = new FilterPresenter(this.#filterContainer, this.#filterModel);
     filterPresenter.init();
     this.#renderListOfTrips();
+    this.#renderButtonNewTrip();
   };
 
   get trips() {
@@ -60,6 +70,27 @@ export class ListPresenter {
     }
     return filteredTrips;
   }
+
+  #renderButtonNewTrip = () => {
+    this.#newEventButtonViewComponent = new NewEventButtonView();
+    this.#newEventButtonViewComponent.setClickHandler(this.#handleNewTripButtonClick);
+    render(this.#newEventButtonViewComponent, this.#mainContainer);
+  };
+
+  createNewTrip = (callback) => {
+    this.#currentSortType = SortType.DEFAULT;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#tripNewPresenter.init(callback);
+  };
+
+  #handleNewTripFormClose = () => {
+    this.#newEventButtonViewComponent.element.disabled = false;
+  };
+
+  #handleNewTripButtonClick = () => {
+    this.createNewTrip(this.#handleNewTripFormClose);
+    this.#newEventButtonViewComponent.element.disabled = true;
+  };
 
   #renderListOfTrips = () => {
     const trips = this.trips;
@@ -159,17 +190,15 @@ export class ListPresenter {
     remove(this.#noTripsComponent);
     remove(this.#infoComponent);
 
+    this.#tripNewPresenter.destroy();
+
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
     }
   };
 
-  // #handleTripChange = (updatedTrip) => {
-  //   // this.#trips = updateItem(this.#trips, updatedTrip);
-  //   this.#tripPresenter.get(updatedTrip.id).init(updatedTrip);
-  // };
-
   #handleModeChange = () => {
     this.#tripPresenter.forEach((presenter) => presenter.resetView());
+    this.#tripNewPresenter.destroy();
   };
 }

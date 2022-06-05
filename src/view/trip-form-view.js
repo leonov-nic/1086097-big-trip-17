@@ -6,38 +6,15 @@ import {descriptionOfTrip} from '../const';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const newBlankTrip = {
-  basePrice: '',
-  dateFrom: 'null',
-  dateTo: 'null',
-  destination: {
-    description: '',
-    name: '',
-    pictures: [
-      {
-        src: '#',
-        description: '',
-      }
-    ]
-  },
-  id: '',
-  offers: {
-    type: '',
-    offers: [],
-  },
-  type: '',
-};
-
-const createTripFormTemplate = (trip) => {
+const createTripFormTemplate = (trip, newForm) => {
   const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
 
-  const currentOffers = generateAllOffersOfTrip(offersOfTrip, type);
+  const currentOffers = type ? generateAllOffersOfTrip(offersOfTrip, type) : [];
 
   const newDateFrom = humanizeTripDueFullDate(dateFrom);
   const newDateTo = humanizeTripDueFullDate(dateTo);
 
-  const currentTripOffers = Object.values(offers.offers);
-  // console.log(offers.offers);
+  const currentTripOffers = offers.offers ? Object.values(offers.offers) : [];
 
   const createTypesOfTrip = () => (
     typesOfTrip.map((itemType) => {
@@ -53,11 +30,11 @@ const createTripFormTemplate = (trip) => {
   );
 
   const createPicturesOfTrip = () => (
-    getDestinationByName(descriptionOfTrip, destination.name).pictures.map((item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}">`)).join(' ')
+    destination.name ? getDestinationByName(descriptionOfTrip, destination.name).pictures.map((item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}">`)).join(' ') : ''
   );
 
   const createOffersOfTrip = () => (
-    currentOffers.offers.map((offer) => {
+    currentOffers.offers ? currentOffers.offers.map((offer) => {
       const checked = currentTripOffers.some((item) => item.id === offer.id);
 
       return (`
@@ -69,7 +46,7 @@ const createTripFormTemplate = (trip) => {
             <span class="event__offer-price">${offer.price}</span>
           </label>
         </div>`);
-    }).join('')
+    }).join('') : []
   );
 
   return (`
@@ -95,7 +72,7 @@ const createTripFormTemplate = (trip) => {
             <label class="event__label  event__type-output" for="event-destination-${id}">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination${id}" value="${destination.name}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination${id}" value="${destination ? destination.name : ''}" list="destination-list-1">
             <datalist id="destination-list-1">
               <option value="Amsterdam"></option>
               <option value="Geneva"></option>
@@ -120,7 +97,7 @@ const createTripFormTemplate = (trip) => {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__reset-btn" type="reset">${newForm ? 'Cancel' : 'Delete'}</button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
@@ -135,8 +112,8 @@ const createTripFormTemplate = (trip) => {
           </section>
 
           <section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
-            <p class="event__destination-description">${destination.description}</p>
+            <h3 class="event__section-title  event__section-title--destination">${destination ? destination.name : ''}</h3>
+            <p class="event__destination-description">${destination ? destination.description : ''}</p>
             <div class="event__photos-container">
 
             <div class="event__photos-tape">
@@ -152,10 +129,10 @@ const createTripFormTemplate = (trip) => {
 
 export class TripFormView extends AbstractStatefulView {
   #datepicker = null;
-
-  constructor(trip = newBlankTrip) {
+  _newForm = null;
+  constructor(trip, newForm = false) {
     super();
-
+    this._newForm = newForm;
     this._state = TripFormView.parseTripToState(trip);
 
     this.#setInnerHandlers();
@@ -192,7 +169,7 @@ export class TripFormView extends AbstractStatefulView {
   };
 
   get template() {
-    return createTripFormTemplate(this._state);
+    return createTripFormTemplate(this._state, this._newForm);
   }
 
   #placeChangeHandler = (evt) => {
@@ -200,11 +177,14 @@ export class TripFormView extends AbstractStatefulView {
       this.updateElement({
         destination: getDestinationByName(descriptionOfTrip, evt.target.value)
       });
+    } else {
+      this.updateElement({
+        destination: {...this._state.destination, description: '', name: '', pictures: []},
+      });
     }
 
     this.updateElement({
       offers: {...this._state.offers, offers: []},
-
     });
   };
 
@@ -218,9 +198,15 @@ export class TripFormView extends AbstractStatefulView {
     // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
   };
 
-  static parseTripToState = (trip) => ({...trip,
+  static parseTripToState = (trip) => {
+    if (!this._newForm) {
+      return {...trip, };
+    } else {
+      return {...trip, dateFrom: '', dateTo: ''};
+    }
+
     // noCheckedOffer: false,
-  });
+  };
 
   static parseStateToTrip = (state) => {
     const trip = {...state};
