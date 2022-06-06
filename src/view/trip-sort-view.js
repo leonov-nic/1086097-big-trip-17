@@ -38,7 +38,6 @@ export class tripSortView extends AbstractView {
     this.#currentSortType = currentSortType;
   }
 
-
   get template() {
     return createTripSortTemplate(this.#currentSortType);
   }

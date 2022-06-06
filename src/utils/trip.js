@@ -31,6 +31,16 @@ const getDurationTime = (dateto, datefrom) => `${Number(dayjs(dayjs(dateto).diff
 
 const getDurationTimeForSort = (dateto, datefrom) => dayjs(dateto).diff(dayjs(datefrom));
 
+const sortTripByDate = (tripA, tripB) => {
+  if (tripA.dateFrom > tripB.dateFrom) {
+    return -1;
+  }
+  if (tripA.dateFrom < tripB.dateFrom) {
+    return 1;
+  }
+  return 0;
+};
+
 const sortTripByPrice = (tripA, tripB) => {
   if (tripA.basePrice > tripB.basePrice) {
     return -1;
@@ -66,6 +76,7 @@ export {
   createPeriodOfTrips,
   sortTripByPrice,
   sortTripByTime,
+  sortTripByDate,
   generateAllOffersOfTrip,
   getDestinationByName,
   isDatesEqual

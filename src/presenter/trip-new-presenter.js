@@ -1,16 +1,13 @@
 import { render, remove, RenderPosition } from '../framework/render';
 import { TripFormView } from '../view/trip-form-view';
-// import { isEscKeyDown } from '../utils/common';
-// import { isDatesEqual } from '../utils/trip';
-// import { Mode } from '../const';
 import {UserAction, UpdateType} from '../const.js';
 
-const currentDate = new Date;
+const currentTime = new Date();
 
 const newBlankTrip = {
   basePrice: '',
-  dateFrom: `${currentDate}`,
-  dateTo: `${currentDate}`,
+  dateFrom: `${currentTime}`,
+  dateTo: `${currentTime}`,
   destination: {
     description: '',
     name: '',
@@ -51,12 +48,10 @@ export default class NewTripPresenter {
     this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#formComponent.setDeleteFormClickHandler(this.#handleDeleteClick);
     this.#formComponent.setAddDeleteOffers();
-    // render(this.#formComponent, this.#listComponent);
+
     render(this.#formComponent, this.#listComponent, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#onEscKeyDown);
-
   };
-
 
   destroy = () => {
     if (this.#formComponent === null) {
@@ -79,7 +74,7 @@ export default class NewTripPresenter {
   };
 
   #handleFormSubmit = (trip) => {
-    this.#changeData(UserAction.ADD_TRIP, UpdateType.MINOR, {id: '45645', ...trip});
+    this.#changeData(UserAction.ADD_TRIP, UpdateType.MAJOR, {id: '45645', ...trip});
     this.destroy();
   };
 

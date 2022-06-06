@@ -5,6 +5,7 @@ import { offersOfTrip, typesOfTrip } from '../const';
 import {descriptionOfTrip} from '../const';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import he from 'he';
 
 const createTripFormTemplate = (trip, newForm) => {
   const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
@@ -56,7 +57,7 @@ const createTripFormTemplate = (trip, newForm) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="${type ? `Event ${type} icon` : ''}">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type ? type : '#'}.png" alt="${type ? `Event ${type} icon` : ''}">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -129,10 +130,10 @@ const createTripFormTemplate = (trip, newForm) => {
 
 export class TripFormView extends AbstractStatefulView {
   #datepicker = null;
-  _newForm = false;
+  #newForm = false;
   constructor(trip, newForm = false) {
     super();
-    this._newForm = newForm;
+    this.#newForm = newForm;
     this._state = TripFormView.parseTripToState(trip);
 
     this.#setInnerHandlers();
@@ -169,7 +170,7 @@ export class TripFormView extends AbstractStatefulView {
   };
 
   get template() {
-    return createTripFormTemplate(this._state, this._newForm);
+    return createTripFormTemplate(this._state, this.#newForm);
   }
 
   #placeChangeHandler = (evt) => {
@@ -194,15 +195,15 @@ export class TripFormView extends AbstractStatefulView {
     this.updateElement({
       type: evt.target.textContent,
     });
-
     // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
   };
 
   #priceChangeHandler = (evt) => {
     evt.preventDefault();
 
+    if (isNaN(evt.target.value)) { return 0; }
     this._setState({
-      basePrice: evt.target.value,
+      basePrice: Math.trunc(evt.target.value),
     });
   };
 
