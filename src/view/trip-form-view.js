@@ -29,7 +29,11 @@ const newBlankTrip = {
 };
 
 const createTripFormTemplate = (trip) => {
+
   const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
+
+  const {type, basePrice, dateFrom, dateTo, offers, id, noCheckedOffer, destination} = trip;
+
 
   const currentOffers = generateAllOffersOfTrip(offersOfTrip, type);
 
@@ -57,7 +61,10 @@ const createTripFormTemplate = (trip) => {
 
   const createOffersOfTrip = () => (
     currentOffers.offers.map((offer) => {
+
       const checked = currentTripOffers.some((item) => item.id === offer.id);
+
+
 
       return (`
         <div class="event__offer-selector">
@@ -157,6 +164,7 @@ export class TripFormView extends AbstractStatefulView {
 
     this._state = TripFormView.parseTripToState(trip);
     this.#setInnerHandlers();
+
     this.#setDatepickerFrom();
     this.#setDatepickerTo();
   }
@@ -170,6 +178,8 @@ export class TripFormView extends AbstractStatefulView {
     }
   };
 
+
+
   reset = (trip) => {
     this.updateElement(
       TripFormView.parseTripToState(trip),
@@ -180,8 +190,10 @@ export class TripFormView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseFormClickHandler(this._callback.click);
+
     this.#setDatepickerFrom();
     this.#setDatepickerTo();
+
   };
 
   get template() {
@@ -204,18 +216,24 @@ export class TripFormView extends AbstractStatefulView {
     });
     // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
     this.updateElement({
+
       offers: {...this._state.offers, offers: []},
+
     });
   };
 
   static parseTripToState = (trip) => ({...trip,
+
     // noCheckedOffer: false,
+
   });
 
   static parseStateToTask = (state) => {
     const trip = {...state};
 
+
     // delete trip.noCheckedOffer;
+
     return trip;
   };
 
@@ -276,4 +294,5 @@ export class TripFormView extends AbstractStatefulView {
 
     }
   };
+
 }
