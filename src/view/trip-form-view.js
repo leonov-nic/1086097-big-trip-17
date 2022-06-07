@@ -31,6 +31,7 @@ const createTripFormTemplate = (trip, newForm) => {
   );
 
   const createPicturesOfTrip = () => (
+    
     destination.name ? getDestinationByName(descriptionOfTrip, destination.name).pictures.map((item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}">`)).join(' ') : ''
   );
 
@@ -73,6 +74,7 @@ const createTripFormTemplate = (trip, newForm) => {
             <label class="event__label  event__type-output" for="event-destination-${id}">
               ${type}
             </label>
+
             <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination${id}" value="${destination ? destination.name : ''}" list="destination-list-1">
             <datalist id="destination-list-1">
               <option value="Amsterdam"></option>
@@ -113,6 +115,7 @@ const createTripFormTemplate = (trip, newForm) => {
           </section>
 
           <section class="event__section  event__section--destination">
+
             <h3 class="event__section-title  event__section-title--destination">${destination ? destination.name : ''}</h3>
             <p class="event__destination-description">${destination ? destination.description : ''}</p>
             <div class="event__photos-container">
@@ -161,6 +164,7 @@ export class TripFormView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseFormClickHandler(this._callback.click);
+
     this.setDeleteFormClickHandler(this._callback.deleteFormClick);
 
     this.#setDatepickerTo();
@@ -192,6 +196,10 @@ export class TripFormView extends AbstractStatefulView {
   #typeChangeHandler = (evt) => {
     evt.preventDefault();
 
+    this._setState({
+      type: evt.target.textContent,
+    });
+    // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
     this.updateElement({
       type: evt.target.textContent,
     });
@@ -314,5 +322,11 @@ export class TripFormView extends AbstractStatefulView {
         offers: {...this._state.offers, offers: [...this._state.offers.offers.filter((item) => item.title !== nameOffer)]},
       });
     }
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#typeChangeHandler);
+    // if (typeof this._state.destination !=='undefined') {}
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#placeChangeHandler);
   };
 }
