@@ -94,8 +94,10 @@ export default class TripPresenter {
   };
 
   #handleFormSubmit = (update) => {
-    const isMinorUpdate = !isDatesEqual(this.#trip.dateFrom, update.dateFrom) || !isDatesEqual(this.#trip.dateTo, update.dateTo);
-    this.#changeData(UserAction.UPDATE_TRIP, isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH, update);
+
+    // const isMinorUpdate = !isDatesEqual(this.#trip.dateFrom, update.dateFrom) || !isDatesEqual(this.#trip.dateTo, update.dateTo) || this.#trip.offers.offers.length !== update.offers.offers.length;
+    // this.#changeData(UserAction.UPDATE_TRIP, isMinorUpdate ? UpdateType.MAJOR : UpdateType.PATCH, update);
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.MINOR, update);
     this.#replaceFormToTrip();
   };
 

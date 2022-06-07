@@ -1,11 +1,11 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTripDueFullDate } from '../utils/trip-form';
-import { generateAllOffersOfTrip, getDestinationByName } from '../utils/trip';
-import { offersOfTrip, typesOfTrip } from '../const';
-import {descriptionOfTrip} from '../const';
+import { generateAllOffersOfTrip, getDestinationByName, isDateToNotCorrect } from '../utils/trip';
+import { offersOfTrip, typesOfTrip, descriptionOfTrip } from '../const';
+
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import he from 'he';
+// import he from 'he';
 
 const createTripFormTemplate = (trip, newForm) => {
   const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
@@ -244,12 +244,26 @@ export class TripFormView extends AbstractStatefulView {
   };
 
   #dateToChangeHandler = ([userDate]) => {
+    if (isDateToNotCorrect(this._state.dateFrom, userDate)) {
+      this.updateElement({
+        dateTo: this._state.dateFrom,
+      });
+      return;
+    }
+
     this.updateElement({
       dateTo: userDate,
     });
   };
 
   #dateFromChangeHandler = ([userDate]) => {
+    if (isDateToNotCorrect(userDate, this._state.dateTo)) {
+      this.updateElement({
+        dateFrom: this._state.dateTo,
+      });
+      return;
+    }
+
     this.updateElement({
       dateFrom: userDate,
     });

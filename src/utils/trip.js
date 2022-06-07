@@ -4,8 +4,9 @@ dayjs.extend(minMax);
 
 // console.log(dayjs())
 
-// import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-// dayjs.extend(isSameOrBefore);
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+
+dayjs.extend(isSameOrAfter);
 
 const createPeriodOfTrips = (trips) => {
   const arrayOfDateFrom = trips.map((trip) => dayjs(trip.dateFrom));
@@ -26,10 +27,10 @@ const humanizeTripDueDate = (date) => dayjs(date).format('HH:mm');
 const humanizeTripDueDateTwo = (date) => dayjs(date).format('MMM D');
 
 const getDurationTime = (dateto, datefrom) => `${Number(dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('MM')) > 1 ?
-  dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('M[Months] DD[D] HH[H] mm[M]') :
+  dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('M[Months] D[D] HH[H] mm[M]') :
   dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('M[Month] DD[D] HH[H] mm[M]')}`;
 
-const getDurationTimeForSort = (dateto, datefrom) => dayjs(dateto).diff(dayjs(datefrom));
+// const getDurationTimeForSort = (dateto, datefrom) => dayjs(dateto).diff(dayjs(datefrom));
 
 const sortTripByDate = (tripA, tripB) => {
   if (tripA.dateFrom > tripB.dateFrom) {
@@ -52,20 +53,33 @@ const sortTripByPrice = (tripA, tripB) => {
 };
 
 const sortTripByTime = (tripA, tripB) => {
-  const diffA = getDurationTimeForSort(tripA.dateTo, tripA.dateFrom);
-  const diffB = getDurationTimeForSort(tripB.dateTo, tripB.dateFrom);
-  if (diffA > diffB) {
+  if (dayjs(tripA.dateTo).isAfter(dayjs(tripB.dateTo), 'm')) {
     return -1;
   }
-  if (diffA < diffB) {
+  if (dayjs(tripA.dateTo).isBefore(dayjs(tripB.dateTo), 'm')) {
     return 1;
   }
   return 0;
 };
 
+// const sortTripByTime = (tripA, tripB) => {
+//   const diffA = Math.abs(getDurationTimeForSort(tripA.dateTo, tripA.dateFrom));
+//   const diffB = Math.abs(getDurationTimeForSort(tripB.dateTo, tripB.dateFrom));
+//   console.log(diffA);
+//   console.log(diffB);
+//   if (diffA > diffB) {
+//     return -1;
+//   }
+//   if (diffA < diffB) {
+//     return 1;
+//   }
+//   return 0;
+// };
+
 const isTripExpiringToday = (datefrom) => datefrom && dayjs(datefrom).isSame(dayjs(), 'd') || datefrom && dayjs(datefrom).isAfter(dayjs(), 'd');
 const isTripOverdue = (dateto) => dateto && dayjs(dateto).isBefore(dayjs(), 'd');
-// const isTripOverdue = (dateto) => dateto && dayjs(dateto).isSameOrBefore(dayjs(), 'd');
+const isDateToNotCorrect = (datefrom, dateto) => dayjs(dateto).isBefore(dayjs(datefrom));
+// const isTripOverdue = (dateto) => dateto && dayjs(dateto).isAfter(dayjs(), 'd');
 
 export {
   humanizeTripDueDate,
@@ -73,6 +87,7 @@ export {
   getDurationTime,
   isTripExpiringToday,
   isTripOverdue,
+  isDateToNotCorrect,
   createPeriodOfTrips,
   sortTripByPrice,
   sortTripByTime,

@@ -1,13 +1,20 @@
 import { render, remove, RenderPosition } from '../framework/render';
 import { TripFormView } from '../view/trip-form-view';
 import {UserAction, UpdateType} from '../const.js';
+import dayjs from 'dayjs';
 
-const currentTime = new Date();
+// const currentTime = new Date();
+// const y = currentTime.getFullYear()%100;
+// const m = currentTime.getMonth()+1;
+// const d = currentTime.getDate();
+// const today = `${y} ${m} ${d}`;
+
+const today = dayjs();
 
 const newBlankTrip = {
   basePrice: '',
-  dateFrom: `${currentTime}`,
-  dateTo: `${currentTime}`,
+  dateFrom: `${today}`,
+  dateTo: `${today}`,
   destination: {
     description: '',
     name: '',
@@ -19,7 +26,10 @@ const newBlankTrip = {
     ]
   },
   id: '',
-  offers: [],
+  offers: {
+    type: '',
+    offers: []
+  },
   type: '',
 };
 

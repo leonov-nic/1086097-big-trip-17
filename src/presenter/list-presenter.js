@@ -152,7 +152,7 @@ export class ListPresenter {
     if (this.#currentSortType === type) {return;}
     this.#currentSortType = type;
     this.#handleModelEvent(UpdateType.MINOR);
-    console.log( this.#currentSortType);
+
     if (this.#currentSortType === SortType.DEFAULT) {
       this.#handleModelEvent(UpdateType.MAJOR);
     }
