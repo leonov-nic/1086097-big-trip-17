@@ -3,6 +3,8 @@ import { humanizeTripDueFullDate } from '../utils/trip-form';
 import { generateAllOffersOfTrip, getDestinationByName } from '../utils/trip';
 import { offersOfTrip, typesOfTrip } from '../const';
 import {descriptionOfTrip} from '../const';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const newBlankTrip = {
   basePrice: '',
@@ -27,9 +29,11 @@ const newBlankTrip = {
 };
 
 const createTripFormTemplate = (trip) => {
+
+  const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
+
   const {type, basePrice, dateFrom, dateTo, offers, id, noCheckedOffer, destination} = trip;
 
-  // console.log(noCheckedOffer);
 
   const currentOffers = generateAllOffersOfTrip(offersOfTrip, type);
 
@@ -57,11 +61,10 @@ const createTripFormTemplate = (trip) => {
 
   const createOffersOfTrip = () => (
     currentOffers.offers.map((offer) => {
-      let checked = currentTripOffers.some((item) => item.id === offer.id);
 
-      if (noCheckedOffer) {
-        checked = false;
-      }
+      const checked = currentTripOffers.some((item) => item.id === offer.id);
+
+
 
       return (`
         <div class="event__offer-selector">
@@ -108,7 +111,7 @@ const createTripFormTemplate = (trip) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${newDateFrom}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${newDateFrom } ">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
             <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${newDateTo}">
@@ -154,13 +157,28 @@ const createTripFormTemplate = (trip) => {
 };
 
 export class TripFormView extends AbstractStatefulView {
+  #datepicker = null;
 
   constructor(trip = newBlankTrip) {
     super();
 
     this._state = TripFormView.parseTripToState(trip);
     this.#setInnerHandlers();
+
+    this.#setDatepickerFrom();
+    this.#setDatepickerTo();
   }
+
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#datepicker) {
+      this.#datepicker.destroy();
+      this.#datepicker = null;
+    }
+  };
+
+
 
   reset = (trip) => {
     this.updateElement(
@@ -172,6 +190,10 @@ export class TripFormView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseFormClickHandler(this._callback.click);
+
+    this.#setDatepickerFrom();
+    this.#setDatepickerTo();
+
   };
 
   get template() {
@@ -194,18 +216,23 @@ export class TripFormView extends AbstractStatefulView {
     });
     // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
     this.updateElement({
-      noCheckedOffer: true,
+
+      offers: {...this._state.offers, offers: []},
+
     });
   };
 
   static parseTripToState = (trip) => ({...trip,
-    noCheckedOffer: false,
+
+    // noCheckedOffer: false,
+
   });
 
   static parseStateToTask = (state) => {
     const trip = {...state};
 
-    delete trip.noCheckedOffer;
+
+    // delete trip.noCheckedOffer;
 
     return trip;
   };
@@ -235,4 +262,37 @@ export class TripFormView extends AbstractStatefulView {
     // if (typeof this._state.destination !=='undefined') {}
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#placeChangeHandler);
   };
+
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
+  };
+
+  #setDatepickerFrom = () => {
+    if (this._state.dateFrom) {
+      this.#datepicker = flatpickr(
+        this.element.querySelector('input[name="event-start-time"]'),
+        { dateFormat: 'y/m/d H:i', defaultDate: this._state.dateFrom, onChange: this.#dateFromChangeHandler,  enableTime: true,},
+      );
+
+    }
+  };
+
+  #setDatepickerTo = () => {
+    if (this._state.dateFrom) {
+      this.#datepicker = flatpickr(
+        this.element.querySelector('input[name="event-end-time"]'),
+        { dateFormat: 'y/m/d H:i', defaultDate: this._state.To, onChange: this.#dateToChangeHandler,  enableTime: true,},
+      );
+
+    }
+  };
+
 }
