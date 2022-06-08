@@ -4,7 +4,6 @@ import { createPeriodOfTrips }  from '../utils/trip';
 const createTripInfoTemplate = (trips) => {
   const period = trips.length ? createPeriodOfTrips(trips) : '';
 
-
   const namesOfDestination = trips.map((item) => item.destination.name);
   const threeNamesOfDestination = trips.map((item) => item.destination.name).join(' — ');
 
@@ -13,8 +12,8 @@ const createTripInfoTemplate = (trips) => {
   let totalСost = basicСostOfAllOffers;
   let sumOfAllOffers = 0;
   trips.forEach((trip) => {
-    if (trip.offers.offers) {
-      trip.offers.offers.forEach((offer) => costOfAllOffers.push(offer.price));
+    if (trip.offers) {
+      trip.offers.forEach((offer) => costOfAllOffers.push(offer.price));
     }
   });
   if (costOfAllOffers.length !== 0) {

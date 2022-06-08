@@ -19,7 +19,7 @@ const createPeriodOfTrips = (trips) => {
 
 const isDatesEqual = (dateA, dateB) => dayjs(dateA).isSame(dateB);
 
-const generateAllOffersOfTrip = ((offers, type) => offers.find((item) => item.type === type));
+const getOffersByType = (offers, type) => offers.find((offer) => offer.type === type).offers;
 
 const getDestinationByName = ((destinations, name) => destinations.find((item) => item.name === name));
 
@@ -92,7 +92,7 @@ export {
   sortTripByPrice,
   sortTripByTime,
   sortTripByDate,
-  generateAllOffersOfTrip,
+  getOffersByType,
   getDestinationByName,
   isDatesEqual
 };

@@ -5,7 +5,6 @@ const createTripTemplate = (trip) => {
   const {type, basePrice, destination, dateFrom, dateTo, isFavorite, offers} = trip;
 
   const dateFinish = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
-  // console.log(isDateToNotCorrect(dateFrom, dateTo));
   const dateMonth = humanizeTripDueDateTwo(dateFrom);
   const dateStart = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
   const durationTime = getDurationTime(dateTo, dateFrom);
@@ -13,7 +12,7 @@ const createTripTemplate = (trip) => {
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
   const createAdditionalServices = () => (
-    offers.offers ? `${Object.values(offers.offers).map((offer) =>
+    offers ? `${Object.values(offers).map((offer) =>
       `
       <li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>

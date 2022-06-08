@@ -13,12 +13,14 @@ import {filter} from '../utils/filter';
 
 import NewTripPresenter from './trip-new-presenter.js';
 import NewEventButtonView from '../view/new-event-button-view';
-
+import TripLoadingView from '../view/trip-loading-view';
 
 export class ListPresenter {
   #newEventButtonViewComponent = null;
   #sortComponent = null;
   #infoComponent = null;
+  // #loadingComponent = new TripLoadingView();
+  // #isLoading = true;
 
   #tripListComponent = new TripListView();
   #tripContainer = null;
@@ -101,6 +103,11 @@ export class ListPresenter {
         this.#renderListOfTrips();
         // - обновить всю доску (например, при переключении фильтра)
         break;
+      // case UpdateType.INIT:
+      //   this.#isLoading = false;
+      //   remove(this.#loadingComponent);
+      //   this.#renderListOfTrips();
+      //   break;
     }
   };
 
@@ -126,6 +133,14 @@ export class ListPresenter {
   };
 
   #renderListOfTrips = () => {
+    this.#renderSort();
+    this.#renderList();
+
+    // if (this.#isLoading) {
+    //   this.#renderLoading();
+    //   return;
+    // }
+
     const trips = this.trips;
     const tripsCount = trips.length;
 
@@ -134,11 +149,9 @@ export class ListPresenter {
       return;
     }
 
-    this.#infoComponent = new TripInfoView(this.#tripsModel.trips);
-    render(this.#infoComponent, this.#mainContainer, RenderPosition.AFTERBEGIN);
+    this.#renderInfo();
 
-    this.#renderSort();
-    this.#renderList();
+
     this.#renderTrips(this.trips);
   };
 
@@ -147,6 +160,15 @@ export class ListPresenter {
     this.#sortComponent.setSortTypeClickHandler(this.#handleSortTypeChange);
     render(this.#sortComponent, this.#tripContainer);
   };
+
+  #renderInfo = () => {
+    this.#infoComponent = new TripInfoView(this.#tripsModel.trips);
+    render(this.#infoComponent, this.#mainContainer, RenderPosition.AFTERBEGIN);
+  };
+
+  // #renderLoading = () => {
+  //   render(this.#loadingComponent, this.#tripListComponent.element, RenderPosition.AFTERBEGIN);
+  // };
 
   #handleSortTypeChange = (type) => {
     if (this.#currentSortType === type) {return;}
@@ -189,6 +211,7 @@ export class ListPresenter {
     remove(this.#sortComponent);
     remove(this.#noTripsComponent);
     remove(this.#infoComponent);
+    // remove(this.#loadingComponent);
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;

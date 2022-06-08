@@ -26,10 +26,7 @@ const newBlankTrip = {
     ]
   },
   id: '',
-  offers: {
-    type: '',
-    offers: []
-  },
+  offers: [],
   type: '',
 };
 

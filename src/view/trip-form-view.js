@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTripDueFullDate } from '../utils/trip-form';
-import { generateAllOffersOfTrip, getDestinationByName, isDateToNotCorrect } from '../utils/trip';
+import { getOffersByType, getDestinationByName, isDateToNotCorrect } from '../utils/trip';
 import { offersOfTrip, typesOfTrip, descriptionOfTrip } from '../const';
 
 import flatpickr from 'flatpickr';
@@ -10,12 +10,12 @@ import 'flatpickr/dist/flatpickr.min.css';
 const createTripFormTemplate = (trip, newForm) => {
   const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
 
-  const currentOffers = type ? generateAllOffersOfTrip(offersOfTrip, type) : [];
+  const offersByType = type ? getOffersByType(offersOfTrip, type) : [];
 
   const newDateFrom = humanizeTripDueFullDate(dateFrom);
   const newDateTo = humanizeTripDueFullDate(dateTo);
 
-  const currentTripOffers = offers.offers ? Object.values(offers.offers) : [];
+  const currentTripOffers = offers ? Object.values(offers) : [];
 
   const createTypesOfTrip = () => (
     typesOfTrip.map((itemType) => {
@@ -35,16 +35,16 @@ const createTripFormTemplate = (trip, newForm) => {
   );
 
   const createOffersOfTrip = () => (
-    currentOffers.offers ? currentOffers.offers.map((offer) => {
-      const checked = currentTripOffers.some((item) => item.id === offer.id);
+    offersByType ? offersByType.map((currentOffer) => {
+      const checked = currentTripOffers.some((offer) => offer.id === currentOffer.id);
 
       return (`
-        <div class="event__offer-selector" data-offer="${offer.title}">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${offer.id}" type="checkbox" name="event-offer-luggage" ${checked ? 'checked' : ''}>
-          <label class="event__offer-label" for="event-offer-luggage-${offer.id}">
-            <span class="event__offer-title">${offer.title}</span>
+        <div class="event__offer-selector" data-offer="${currentOffer.title}">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${currentOffer.id}" type="checkbox" name="event-offer-luggage" ${checked ? 'checked' : ''}>
+          <label class="event__offer-label" for="event-offer-luggage-${currentOffer.id}">
+            <span class="event__offer-title">${currentOffer.title}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-price">${offer.price}</span>
+            <span class="event__offer-price">${currentOffer.price}</span>
           </label>
         </div>`);
     }).join('') : []
@@ -106,7 +106,7 @@ const createTripFormTemplate = (trip, newForm) => {
 
         <section class="event__details">
           <section class="event__section  event__section--offers">
-            <h3 class="event__section-title  event__section-title--offers">${currentOffers.offers ? 'Offers' : ''}</h3>
+            <h3 class="event__section-title  event__section-title--offers">${offersByType.length ? 'Offers' : ''}</h3>
             <div class="event__available-offers">
               ${createOffersOfTrip()}
             </div>
@@ -185,7 +185,7 @@ export class TripFormView extends AbstractStatefulView {
     }
 
     this.updateElement({
-      offers: {...this._state.offers, offers: []},
+      offers: [],
     });
   };
 
@@ -296,22 +296,22 @@ export class TripFormView extends AbstractStatefulView {
   };
 
   setAddDeleteOffers = () => {
-    this.element.querySelector('.event__available-offers').addEventListener('change', this.#changeOffersOfTripHandler);
+    this.element.querySelector('.event__available-offers').addEventListener('change', this.#changeTheQuantityOffersOfTripHandler);
   };
 
-  #changeOffersOfTripHandler = (evt) => {
-    const nameOffer = evt.target.closest('.event__offer-selector').dataset.offer;
-    const currentOffers = generateAllOffersOfTrip(offersOfTrip, this._state.type);
+  #changeTheQuantityOffersOfTripHandler = (evt) => {
+    const nameOfTheSelectedOffer = evt.target.closest('.event__offer-selector').dataset.offer;
+    const offersByType = getOffersByType(offersOfTrip, this._state.type);
 
-    const newOffer = currentOffers.offers.filter((item) => item.title === nameOffer);
+    const foundOffer = offersByType.filter((item) => item.title === nameOfTheSelectedOffer);
 
-    if (!this._state.offers.offers.some((item) => item.title === nameOffer)) {
+    if (!this._state.offers.some((offer) => offer.title === nameOfTheSelectedOffer)) {
       this.updateElement({
-        offers: {...this._state.offers, offers: [...this._state.offers.offers, ...newOffer]},
+        offers: [...this._state.offers, ...foundOffer],
       });
     } else {
       this.updateElement({
-        offers: {...this._state.offers, offers: [...this._state.offers.offers.filter((item) => item.title !== nameOffer)]},
+        offers: [...this._state.offers.filter((offer) => offer.title !== nameOfTheSelectedOffer)],
       });
     }
   };

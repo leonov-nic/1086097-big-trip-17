@@ -1,8 +1,49 @@
 import { generateTrip } from '../fish/trip';
 import Observable from '../framework/observable.js';
+import {UpdateType} from '../const.js';
 
 export default class TripsModel extends Observable {
   #trips = Array.from({length: 5}, generateTrip);
+  // #trips = [];
+  #tripsApiService = null;
+
+  constructor(tripsApiService) {
+    super();
+    this.#tripsApiService = tripsApiService;
+
+
+    console.log(this.#trips);
+    this.#tripsApiService.trips.then((trips) => {
+      console.log(trips.map(this.#adaptToClient));
+    });
+  }
+
+  // init = async () => {
+  //   try {
+  //     const trips = await this.#tripsApiService.trips;
+  //     this.#trips = trips.map(this.#adaptToClient);
+  //   } catch(err) {
+  //     this.#trips = [];
+  //   }
+
+  //   this._notify(UpdateType.INIT);
+  // };
+
+  #adaptToClient = (trip) => {
+    const adaptedTrip = {...trip,
+      dateFrom: trip['date_from'] !== null ? new Date(trip['date_from']) : trip['date_from'], // На клиенте дата хранится как экземпляр Date
+      dateTo: trip['date_to'] !== null ? new Date(trip['date_to']) : trip['date_to'],
+      basePrice: trip['base_price'],
+      isFavorite: trip['is_favorite'],
+    };
+
+    delete adaptedTrip['date_from'];
+    delete adaptedTrip['date_to'];
+    delete adaptedTrip['base_price'];
+    delete adaptedTrip['is_favorite'];
+
+    return adaptedTrip;
+  };
 
   get trips() {
     return this.#trips;
