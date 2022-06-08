@@ -1,5 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTripDueFullDate } from '../utils/trip-form';
+
 import { generateAllOffersOfTrip, getDestinationByName, isDateToNotCorrect } from '../utils/trip';
 import { offersOfTrip, typesOfTrip, descriptionOfTrip } from '../const';
 
@@ -9,7 +10,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const createTripFormTemplate = (trip, newForm) => {
   const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
-
+  
   const currentOffers = type ? generateAllOffersOfTrip(offersOfTrip, type) : [];
 
   const newDateFrom = humanizeTripDueFullDate(dateFrom);
@@ -36,6 +37,7 @@ const createTripFormTemplate = (trip, newForm) => {
   );
 
   const createOffersOfTrip = () => (
+
     currentOffers.offers ? currentOffers.offers.map((offer) => {
       const checked = currentTripOffers.some((item) => item.id === offer.id);
 
@@ -85,6 +87,7 @@ const createTripFormTemplate = (trip, newForm) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
+
             <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${newDateFrom} ">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
@@ -133,6 +136,7 @@ const createTripFormTemplate = (trip, newForm) => {
 
 export class TripFormView extends AbstractStatefulView {
   #datepicker = null;
+
   #newForm = false;
   constructor(trip, newForm = false) {
     super();
@@ -329,4 +333,37 @@ export class TripFormView extends AbstractStatefulView {
     // if (typeof this._state.destination !=='undefined') {}
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#placeChangeHandler);
   };
+
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
+  };
+
+  #setDatepickerFrom = () => {
+    if (this._state.dateFrom) {
+      this.#datepicker = flatpickr(
+        this.element.querySelector('input[name="event-start-time"]'),
+        { dateFormat: 'y/m/d H:i', defaultDate: this._state.dateFrom, onChange: this.#dateFromChangeHandler,  enableTime: true,},
+      );
+
+    }
+  };
+
+  #setDatepickerTo = () => {
+    if (this._state.dateFrom) {
+      this.#datepicker = flatpickr(
+        this.element.querySelector('input[name="event-end-time"]'),
+        { dateFormat: 'y/m/d H:i', defaultDate: this._state.To, onChange: this.#dateToChangeHandler,  enableTime: true,},
+      );
+
+    }
+  };
+
 }
