@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render';
 import { TripFormView } from '../view/trip-form-view';
 import { TripView } from '../view/trip-view';
 import { isEscKeyDown } from '../utils/common';
-import { isDatesEqual } from '../utils/trip';
+// import { isDatesEqual } from '../utils/trip';
 
 import { Mode } from '../const';
 
@@ -10,6 +10,7 @@ import {UserAction, UpdateType} from '../const.js';
 
 export default class TripPresenter {
   #trip = null;
+  #allOffers = null;
   #tripListComponent = null;
   #changeData = null;
   #tripComponent = null;
@@ -17,10 +18,11 @@ export default class TripPresenter {
   #changeMode = null;
   #mode = Mode.DEFAULT;
 
-  constructor (listComponent, changeDate, changeMode) {
+  constructor (listComponent, changeDate, changeMode, alloffers) {
     this.#tripListComponent = listComponent;
     this.#changeData = changeDate;
     this.#changeMode = changeMode;
+    this.#allOffers = alloffers;
   }
 
   init = (trip) => {
@@ -30,7 +32,7 @@ export default class TripPresenter {
     const prevFormComponent = this.#formComponent;
 
     this.#tripComponent = new TripView(trip);
-    this.#formComponent = new TripFormView(trip);
+    this.#formComponent = new TripFormView(trip, this.#allOffers);
 
     this.#tripComponent.setToFormClickHandler(this.#replaceTripToForm);
     this.#tripComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
@@ -94,7 +96,6 @@ export default class TripPresenter {
   };
 
   #handleFormSubmit = (update) => {
-
     // const isMinorUpdate = !isDatesEqual(this.#trip.dateFrom, update.dateFrom) || !isDatesEqual(this.#trip.dateTo, update.dateTo) || this.#trip.offers.offers.length !== update.offers.offers.length;
     // this.#changeData(UserAction.UPDATE_TRIP, isMinorUpdate ? UpdateType.MAJOR : UpdateType.PATCH, update);
     this.#changeData(UserAction.UPDATE_TRIP, UpdateType.MINOR, update);

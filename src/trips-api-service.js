@@ -11,9 +11,19 @@ export default class TripsApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
-  updateTask = async (trip) => {
+  get offers() {
+    return this._load({url: 'offers'})
+      .then(ApiService.parseResponse);
+  }
+
+  get destinations() {
+    return this._load({url: 'destinations'})
+      .then(ApiService.parseResponse);
+  }
+
+  updateTrip = async (trip) => {
     const response = await this._load({
-      url: `points/:${trip.id}`,
+      url: `points/${trip.id}`,
       method: Method.PUT,
       body: JSON.stringify(this.#adaptToServer(trip)),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -30,6 +40,7 @@ export default class TripsApiService extends ApiService {
       'date_to': trip.dateTo instanceof Date ? trip.dateTo.toISOString() : null,
       'base_price': trip.basePrice,
       'is_favorite': trip.isFavorite,
+      'offers': trip.offers.length ? trip.offers.map((offer) => offer.id) : [],
     };
 
     delete adaptedTrip.dateFrom;

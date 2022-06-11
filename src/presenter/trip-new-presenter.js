@@ -36,13 +36,15 @@ export default class NewTripPresenter {
   #formComponent = null;
   #destroyCallback = null;
   #trip = newBlankTrip;
+  #allOffers = null;
 
-  constructor (listComponent, changeDate) {
+  constructor (listComponent, changeDate, alloffers) {
     this.#listComponent = listComponent;
     this.#changeData = changeDate;
+    this.#allOffers = alloffers;
   }
 
-  init = (callback) => {
+  init = (callback, allOffers) => {
     this.#destroyCallback = callback;
     this.#destroyCallback();
 
@@ -50,7 +52,7 @@ export default class NewTripPresenter {
       return;
     }
 
-    this.#formComponent = new TripFormView(this.#trip, true);
+    this.#formComponent = new TripFormView(this.#trip, allOffers, true);
     this.#formComponent.setCloseFormClickHandler(this.destroy);
     this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#formComponent.setDeleteFormClickHandler(this.#handleDeleteClick);
