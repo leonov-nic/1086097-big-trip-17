@@ -13,7 +13,7 @@ import {filter} from '../utils/filter';
 
 import NewTripPresenter from './trip-new-presenter.js';
 import NewEventButtonView from '../view/new-event-button-view';
-import TripLoadingView from '../view/trip-loading-view';
+// import TripLoadingView from '../view/trip-loading-view';
 
 export class ListPresenter {
   #newEventButtonViewComponent = null;

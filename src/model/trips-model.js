@@ -1,6 +1,6 @@
 import { generateTrip } from '../fish/trip';
 import Observable from '../framework/observable.js';
-import {UpdateType} from '../const.js';
+// import {UpdateType} from '../const.js';
 
 export default class TripsModel extends Observable {
   #trips = Array.from({length: 5}, generateTrip);
@@ -12,10 +12,10 @@ export default class TripsModel extends Observable {
     this.#tripsApiService = tripsApiService;
 
 
-    console.log(this.#trips);
-    this.#tripsApiService.trips.then((trips) => {
-      console.log(trips.map(this.#adaptToClient));
-    });
+    // console.log(this.#trips);
+    // this.#tripsApiService.trips.then((trips) => {
+    //   console.log(trips.map(this.#adaptToClient));
+    // });
   }
 
   // init = async () => {

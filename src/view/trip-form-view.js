@@ -2,10 +2,8 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTripDueFullDate } from '../utils/trip-form';
 import { getOffersByType, getDestinationByName, isDateToNotCorrect } from '../utils/trip';
 import { offersOfTrip, typesOfTrip, descriptionOfTrip } from '../const';
-
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-// import he from 'he';
 
 const createTripFormTemplate = (trip, newForm) => {
   const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
@@ -31,6 +29,7 @@ const createTripFormTemplate = (trip, newForm) => {
   );
 
   const createPicturesOfTrip = () => (
+
     destination.name ? getDestinationByName(descriptionOfTrip, destination.name).pictures.map((item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}">`)).join(' ') : ''
   );
 
@@ -73,6 +72,7 @@ const createTripFormTemplate = (trip, newForm) => {
             <label class="event__label  event__type-output" for="event-destination-${id}">
               ${type}
             </label>
+
             <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination${id}" value="${destination ? destination.name : ''}" list="destination-list-1">
             <datalist id="destination-list-1">
               <option value="Amsterdam"></option>
@@ -83,6 +83,7 @@ const createTripFormTemplate = (trip, newForm) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
+
             <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${newDateFrom} ">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
@@ -113,6 +114,7 @@ const createTripFormTemplate = (trip, newForm) => {
           </section>
 
           <section class="event__section  event__section--destination">
+
             <h3 class="event__section-title  event__section-title--destination">${destination ? destination.name : ''}</h3>
             <p class="event__destination-description">${destination ? destination.description : ''}</p>
             <div class="event__photos-container">
@@ -130,6 +132,7 @@ const createTripFormTemplate = (trip, newForm) => {
 
 export class TripFormView extends AbstractStatefulView {
   #datepicker = null;
+
   #newForm = false;
   constructor(trip, newForm = false) {
     super();
@@ -161,6 +164,7 @@ export class TripFormView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseFormClickHandler(this._callback.click);
+
     this.setDeleteFormClickHandler(this._callback.deleteFormClick);
 
     this.#setDatepickerTo();
@@ -315,4 +319,43 @@ export class TripFormView extends AbstractStatefulView {
       });
     }
   };
+
+  // #setInnerHandlers = () => {
+  //   this.element.querySelector('.event__type-list').addEventListener('click', this.#typeChangeHandler);
+  //   // if (typeof this._state.destination !=='undefined') {}
+  //   this.element.querySelector('.event__input--destination').addEventListener('change', this.#placeChangeHandler);
+  // };
+
+  // #dateFromChangeHandler = ([userDate]) => {
+  //   this.updateElement({
+  //     dateFrom: userDate,
+  //   });
+  // };
+
+  // #dateToChangeHandler = ([userDate]) => {
+  //   this.updateElement({
+  //     dateTo: userDate,
+  //   });
+  // };
+
+  // #setDatepickerFrom = () => {
+  //   if (this._state.dateFrom) {
+  //     this.#datepicker = flatpickr(
+  //       this.element.querySelector('input[name="event-start-time"]'),
+  //       { dateFormat: 'y/m/d H:i', defaultDate: this._state.dateFrom, onChange: this.#dateFromChangeHandler,  enableTime: true,},
+  //     );
+
+  //   }
+  // };
+
+  // #setDatepickerTo = () => {
+  //   if (this._state.dateFrom) {
+  //     this.#datepicker = flatpickr(
+  //       this.element.querySelector('input[name="event-end-time"]'),
+  //       { dateFormat: 'y/m/d H:i', defaultDate: this._state.To, onChange: this.#dateToChangeHandler,  enableTime: true,},
+  //     );
+
+  //   }
+  // };
+
 }
