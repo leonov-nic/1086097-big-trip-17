@@ -1,14 +1,15 @@
 import AbstractView from '../framework/view/abstract-view';
-import { filters } from '../utils/filter';
+import { FilterType } from '../const';
 
-const createTripFilterTemplate = () => {
+const createTripFilterTemplate = (filter, currentFilterType) => {
+  const {type, name} = filter;
 
   const genetateFilters = () => (
-    filters ? `${Object.keys(filters).map((filterName) =>
+    FilterType ? `${Object.values(FilterType).map((filterName) =>
       `
       <div class="trip-filters__filter">
-        <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterName}" ${filterName && filterName === 'Everything' ? 'checked' : ''}>
-        <label class="trip-filters__filter-label" for="filter-${filterName}">${filterName}</label>
+        <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterName}" ${currentFilterType === filterName ? 'checked' : ''}>
+        <label class="trip-filters__filter-label" for="filter-${filterName}" data-filter="${filterName}">${filterName}</label>
       </div>
       `
     ).join('')}` : ''
@@ -24,14 +25,28 @@ const createTripFilterTemplate = () => {
 };
 
 export class TripFilterView extends AbstractView {
-  #trips = null;
+  #currentFilterType = null;
+  #filters = null;
 
-  constructor(trips) {
+  constructor(filters, currentFilterType) {
     super();
-    this.#trips = trips;
+    this.#currentFilterType = currentFilterType;
+    this.#filters = filters;
   }
 
   get template() {
-    return createTripFilterTemplate(this.#trips);
+    return createTripFilterTemplate(this.#filters, this.#currentFilterType);
   }
+
+  setFilterTypeChangeHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
+  };
+
+  #filterTypeChangeHandler = (evt) => {
+    if (evt.target.tagName !== 'LABEL') { return; }
+    evt.preventDefault();
+    // console.log(evt.target.dataset.filter);
+    this._callback.filterTypeChange(evt.target.dataset.filter);
+  };
 }

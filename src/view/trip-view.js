@@ -1,13 +1,15 @@
 import AbstractView from '../framework/view/abstract-view';
-import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo } from '../utils/trip';
+import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo, isDateToNotCorrect } from '../utils/trip';
 
 const createTripTemplate = (trip) => {
   const {type, basePrice, destination, dateFrom, dateTo, isFavorite, offers} = trip;
 
   const dateFinish = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
+  // console.log(isDateToNotCorrect(dateFrom, dateTo));
   const dateMonth = humanizeTripDueDateTwo(dateFrom);
   const dateStart = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
   const durationTime = getDurationTime(dateTo, dateFrom);
+
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
   const createAdditionalServices = () => (

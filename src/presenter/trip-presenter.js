@@ -2,7 +2,11 @@ import { render, replace, remove } from '../framework/render';
 import { TripFormView } from '../view/trip-form-view';
 import { TripView } from '../view/trip-view';
 import { isEscKeyDown } from '../utils/common';
+import { isDatesEqual } from '../utils/trip';
+
 import { Mode } from '../const';
+
+import {UserAction, UpdateType} from '../const.js';
 
 export default class TripPresenter {
   #trip = null;
@@ -32,6 +36,9 @@ export default class TripPresenter {
     this.#tripComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#formComponent.setCloseFormClickHandler(this.#replaceFormToTrip);
     this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
+    this.#formComponent.setDeleteFormClickHandler(this.#handleDeleteClick);
+
+    this.#formComponent.setAddDeleteOffers();
 
     if (prevTripComponent === null || prevFormComponent === null) {
       render(this.#tripComponent, this.#tripListComponent);
@@ -83,11 +90,18 @@ export default class TripPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#trip, isFavorite: !this.#trip.isFavorite});
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.PATCH, {...this.#trip, isFavorite: !this.#trip.isFavorite});
   };
 
-  #handleFormSubmit = (trip) => {
-    this.#changeData(trip);
+  #handleFormSubmit = (update) => {
+
+    // const isMinorUpdate = !isDatesEqual(this.#trip.dateFrom, update.dateFrom) || !isDatesEqual(this.#trip.dateTo, update.dateTo) || this.#trip.offers.offers.length !== update.offers.offers.length;
+    // this.#changeData(UserAction.UPDATE_TRIP, isMinorUpdate ? UpdateType.MAJOR : UpdateType.PATCH, update);
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.MINOR, update);
     this.#replaceFormToTrip();
+  };
+
+  #handleDeleteClick = (trip) => {
+    this.#changeData(UserAction.DELETE_TRIP, UpdateType.MINOR, trip,);
   };
 }

@@ -5,10 +5,34 @@ const Mode = {
   EDITING: 'editing',
 };
 
+const FilterType = {
+  EVERYTHING: 'Everything',
+  FUTURE: 'Future',
+  PAST: 'Past',
+};
+
 const SortType = {
   DEFAULT: 'default',
   TIME: 'time',
   PRICE: 'price',
+};
+
+const UserAction = {
+  UPDATE_TRIP: 'UPDATE_TRIP',
+  ADD_TRIP: 'ADD_TRIP',
+  DELETE_TRIP: 'DELETE_TRIP',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const NoTripsTextType = {
+  [FilterType.EVERYTHING]: 'Click «ADD NEW POINT» in menu to create your first trip',
+  [FilterType.FUTURE]: 'There are no overdue trips now',
+  [FilterType.PAST]: 'There are no trips today',
 };
 
 const offersOfTrip = [
@@ -244,4 +268,4 @@ const descriptionOfTrip = [
   },
 ];
 
-export { offersOfTrip, typesOfTrip, Mode, SortType, descriptionOfTrip};
+export { offersOfTrip, typesOfTrip, Mode, SortType, descriptionOfTrip, UpdateType, UserAction, FilterType, NoTripsTextType };

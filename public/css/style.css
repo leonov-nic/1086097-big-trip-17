@@ -410,6 +410,7 @@ main {
   line-height: 21px; }
   .event--edit {
     display: block;
+    min-height: 483px;
     margin-left: 80px;
     padding: 0;
     background-color: #ffffff;
