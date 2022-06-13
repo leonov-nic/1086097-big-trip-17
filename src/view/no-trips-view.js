@@ -1,10 +1,12 @@
 import AbstractView from '../framework/view/abstract-view';
-import { FilterType, NoTripsTextType } from '../const.js';
+import { NoTripsTextType } from '../const.js';
 
 const createTripLoadingTemplate = (filterType) => {
+
   const textValue = NoTripsTextType[filterType];
+
   return (`<p class="trip-events__msg">${textValue}</p>`);
-}
+};
 
 export default class NoTripsView extends AbstractView {
   #filterType = null;

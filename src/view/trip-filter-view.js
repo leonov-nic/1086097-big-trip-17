@@ -2,13 +2,13 @@ import AbstractView from '../framework/view/abstract-view';
 import { FilterType } from '../const';
 
 const createTripFilterTemplate = (filter, currentFilterType) => {
-  const {type, name} = filter;
+  const {name} = filter;
 
   const genetateFilters = () => (
     FilterType ? `${Object.values(FilterType).map((filterName) =>
       `
       <div class="trip-filters__filter">
-        <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterName}" ${currentFilterType === filterName ? 'checked' : ''}>
+        <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter-${name}" value="${filterName}" ${currentFilterType === filterName ? 'checked' : ''}>
         <label class="trip-filters__filter-label" for="filter-${filterName}" data-filter="${filterName}">${filterName}</label>
       </div>
       `
