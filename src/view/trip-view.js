@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo, isDateToNotCorrect } from '../utils/trip';
+import { humanizeTripDueDate, getDurationTime, humanizeTripDueDateTwo } from '../utils/trip';
 
 const createTripTemplate = (trip) => {
   const {type, basePrice, destination, dateFrom, dateTo, isFavorite, offers} = trip;
@@ -7,6 +7,7 @@ const createTripTemplate = (trip) => {
   const dateFinish = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
   const dateMonth = humanizeTripDueDateTwo(dateFrom);
   const dateStart = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
+
   const durationTime = getDurationTime(dateTo, dateFrom);
 
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
@@ -65,11 +66,11 @@ export class TripView extends AbstractView {
 
   constructor(trip) {
     super();
-    this.trip = trip;
+    this.#trip = trip;
   }
 
   get template() {
-    return createTripTemplate(this.trip);
+    return createTripTemplate(this.#trip);
   }
 
   setToFormClickHandler = (callback) => {

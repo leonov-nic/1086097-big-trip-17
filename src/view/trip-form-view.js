@@ -1,21 +1,28 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTripDueFullDate } from '../utils/trip-form';
 import { getOffersByType, getDestinationByName, isDateToNotCorrect } from '../utils/trip';
-import { typesOfTrip, descriptionOfTrip } from '../const';
+import { typesOfTrip } from '../const';
 
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const createTripFormTemplate = (trip, alloffers, newForm) => {
-  const {type, basePrice, dateFrom, dateTo, offers, id, destination} = trip;
+const createTripFormTemplate = (trip, alloffers, alldestinations, newForm) => {
+  const {type, basePrice, dateFrom, dateTo, offers, id, destination, isDisabled, isSaving, isDeleting} = trip;
 
   const allOffers = alloffers && alloffers.length ? alloffers : [];
   const offersByType = type && allOffers.length ? getOffersByType(allOffers, type) : [];
+
+  const destinations = alldestinations !== 'undefined' ? alldestinations : [];
 
   const newDateFrom = humanizeTripDueFullDate(dateFrom);
   const newDateTo = humanizeTripDueFullDate(dateTo);
 
   const currentTripOffers = offers ? Object.values(offers) : [];
+
+
+  const createDestinationsNameOfTrip = () => (
+    destinations ? destinations.map((place) => (`<option value="${place.name}"></option>`)).join('\n') : []
+  );
 
   const createTypesOfTrip = () => (
     typesOfTrip.map((itemType) => {
@@ -39,7 +46,7 @@ const createTripFormTemplate = (trip, alloffers, newForm) => {
 
       return (`
         <div class="event__offer-selector" data-offer="${currentOffer.title}">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${currentOffer.id}" type="checkbox" name="event-offer-luggage" ${checked ? 'checked' : ''}>
+          <input  class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${currentOffer.id}" type="checkbox" name="event-offer-luggage" ${checked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
           <label class="event__offer-label" for="event-offer-luggage-${currentOffer.id}">
             <span class="event__offer-title">${currentOffer.title}</span>
             &plus;&euro;&nbsp;
@@ -58,7 +65,7 @@ const createTripFormTemplate = (trip, alloffers, newForm) => {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type ? type : '#'}.png" alt="${type ? `Event ${type} icon` : ''}">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox"  ${isDisabled ? 'disabled' : ''}>
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
@@ -73,21 +80,19 @@ const createTripFormTemplate = (trip, alloffers, newForm) => {
               ${type}
             </label>
 
-            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination${id}" value="${destination ? destination.name : ''}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination${id}" value="${destination ? destination.name : ''}" list="destination-list-1"  ${isDisabled ? 'disabled' : ''}>
             <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
+              ${createDestinationsNameOfTrip()}
             </datalist>
           </div>
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
 
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${newDateFrom} ">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${newDateFrom}" ${isDisabled ? 'disabled' : ''}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${newDateTo}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${newDateTo}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -95,11 +100,11 @@ const createTripFormTemplate = (trip, alloffers, newForm) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${newForm ? 'Cancel' : 'Delete'}</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'saving...' : 'save'}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${newForm ? 'Cancel' : `${isDeleting ? 'deleting...' : 'delete'}`} </button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
@@ -132,13 +137,14 @@ const createTripFormTemplate = (trip, alloffers, newForm) => {
 
 export class TripFormView extends AbstractStatefulView {
   #datepicker = null;
-
   #newForm = false;
   #allOffers = null;
+  #allDestinations = null;
 
-  constructor(trip, allOffers, newForm = false) {
+  constructor(trip, allOffers, destinations, newForm = false) {
     super();
     this.#allOffers = allOffers;
+    this.#allDestinations = destinations;
     this.#newForm = newForm;
     this._state = TripFormView.parseTripToState(trip);
 
@@ -177,13 +183,13 @@ export class TripFormView extends AbstractStatefulView {
   };
 
   get template() {
-    return createTripFormTemplate(this._state, this.#allOffers, this.#newForm);
+    return createTripFormTemplate(this._state, this.#allOffers, this.#allDestinations, this.#newForm);
   }
 
   #placeChangeHandler = (evt) => {
-    if (descriptionOfTrip.some((element) => element.name === evt.target.value)) {
+    if (this.#allDestinations && this.#allDestinations.some((element) => element.name === evt.target.value)) {
       this.updateElement({
-        destination: getDestinationByName(descriptionOfTrip, evt.target.value)
+        destination: getDestinationByName(this.#allDestinations, evt.target.value)
       });
     } else {
       this.updateElement({
@@ -215,12 +221,16 @@ export class TripFormView extends AbstractStatefulView {
   };
 
   static parseTripToState = (trip) => (
-    {...trip, }
-    // noCheckedOffer: false,
+    {...trip, isDisabled: false, isSaving: false, isDeleting: false,}
   );
 
   static parseStateToTrip = (state) => {
     const trip = {...state};
+
+    delete trip.isDisabled;
+    delete trip.isSaving;
+    delete trip.isDeleting;
+
     return trip;
   };
 

@@ -11,6 +11,7 @@ import {UserAction, UpdateType} from '../const.js';
 export default class TripPresenter {
   #trip = null;
   #allOffers = null;
+  #allDestinations = null;
   #tripListComponent = null;
   #changeData = null;
   #tripComponent = null;
@@ -18,11 +19,12 @@ export default class TripPresenter {
   #changeMode = null;
   #mode = Mode.DEFAULT;
 
-  constructor (listComponent, changeDate, changeMode, alloffers) {
+  constructor (listComponent, changeDate, changeMode, alloffers, destinations) {
     this.#tripListComponent = listComponent;
     this.#changeData = changeDate;
     this.#changeMode = changeMode;
     this.#allOffers = alloffers;
+    this.#allDestinations = destinations;
   }
 
   init = (trip) => {
@@ -32,14 +34,13 @@ export default class TripPresenter {
     const prevFormComponent = this.#formComponent;
 
     this.#tripComponent = new TripView(trip);
-    this.#formComponent = new TripFormView(trip, this.#allOffers);
+    this.#formComponent = new TripFormView(trip, this.#allOffers, this.#allDestinations, false);
 
     this.#tripComponent.setToFormClickHandler(this.#replaceTripToForm);
     this.#tripComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#formComponent.setCloseFormClickHandler(this.#replaceFormToTrip);
     this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#formComponent.setDeleteFormClickHandler(this.#handleDeleteClick);
-
     this.#formComponent.setAddDeleteOffers();
 
     if (prevTripComponent === null || prevFormComponent === null) {
@@ -96,13 +97,31 @@ export default class TripPresenter {
   };
 
   #handleFormSubmit = (update) => {
-    // const isMinorUpdate = !isDatesEqual(this.#trip.dateFrom, update.dateFrom) || !isDatesEqual(this.#trip.dateTo, update.dateTo) || this.#trip.offers.offers.length !== update.offers.offers.length;
+    // const isMinorUpdate = !isDatesEqual(this.#trip.dateFrom, update.dateFrom) || !isDatesEqual(this.#trip.dateTo, update.dateTo) || this.#trip.offers.length !== update.offers.length;
     // this.#changeData(UserAction.UPDATE_TRIP, isMinorUpdate ? UpdateType.MAJOR : UpdateType.PATCH, update);
     this.#changeData(UserAction.UPDATE_TRIP, UpdateType.MINOR, update);
-    this.#replaceFormToTrip();
+    // this.#replaceFormToTrip();
   };
 
   #handleDeleteClick = (trip) => {
-    this.#changeData(UserAction.DELETE_TRIP, UpdateType.MINOR, trip,);
+    this.#changeData(UserAction.DELETE_TRIP, UpdateType.MINOR, trip);
+  };
+
+  setSaving = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#formComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#formComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
   };
 }

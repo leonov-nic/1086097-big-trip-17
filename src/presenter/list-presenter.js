@@ -51,17 +51,25 @@ export class ListPresenter {
 
 
   init = () => {
-    this.#tripNewPresenter = new NewTripPresenter(this.#tripListComponent.element, this.#handleViewAction, this.#tripsModel.alloffers);
+    this.#tripNewPresenter = new NewTripPresenter(this.#tripListComponent.element, this.#handleViewAction);
     const filterPresenter = new FilterPresenter(this.#filterContainer, this.#filterModel);
     filterPresenter.init();
 
-    this.#renderButtonNewTrip();
+    this.#tripsModel.init()
+      .finally(() => {
+        this.#renderButtonNewTrip();
+      });
     this.#renderListOfTrips();
   };
 
   get allOffers() {
     const offers = this.#tripsModel.alloffers;
     return offers;
+  }
+
+  get destinations() {
+    const destinations = this.#tripsModel.destinations;
+    return destinations;
   }
 
   get trips() {
@@ -84,12 +92,15 @@ export class ListPresenter {
   #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_TRIP:
+        this.#tripPresenter.get(update.id).setSaving();
         this.#tripsModel.updateTrip(updateType, update);
         break;
       case UserAction.ADD_TRIP:
+        this.#tripNewPresenter.setSaving();
         this.#tripsModel.addTrip(updateType, update);
         break;
       case UserAction.DELETE_TRIP:
+        this.#tripPresenter.get(update.id).setDeleting();
         this.#tripsModel.deleteTrip(updateType, update);
         break;
     }
@@ -108,7 +119,6 @@ export class ListPresenter {
       case UpdateType.MAJOR:
         this.#clearList({resetSortType: true});
         this.#renderListOfTrips();
-        // - обновить всю доску (например, при переключении фильтра)
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
@@ -128,7 +138,7 @@ export class ListPresenter {
   createNewTrip = (callback) => {
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#tripNewPresenter.init(callback, this.#tripsModel.alloffers);
+    this.#tripNewPresenter.init(callback, this.allOffers, this.destinations);
   };
 
   #handleNewTripFormClose = () => {
@@ -203,7 +213,7 @@ export class ListPresenter {
   };
 
   #renderTrip = (trip) => {
-    const tripPresenter = new TripPresenter(this.#tripListComponent.element, this.#handleViewAction, this.#handleModeChange, this.#tripsModel.alloffers);
+    const tripPresenter = new TripPresenter(this.#tripListComponent.element, this.#handleViewAction, this.#handleModeChange, this.allOffers, this.destinations);
     tripPresenter.init(trip, );
     this.#tripPresenter.set(trip.id, tripPresenter);
   };

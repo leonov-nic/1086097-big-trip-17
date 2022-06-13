@@ -2,8 +2,6 @@ import dayjs from 'dayjs';
 import minMax from 'dayjs/plugin/minMax';
 dayjs.extend(minMax);
 
-// console.log(dayjs())
-
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 dayjs.extend(isSameOrAfter);
@@ -21,7 +19,7 @@ const isDatesEqual = (dateA, dateB) => dayjs(dateA).isSame(dateB);
 
 const getOffersByType = (offers, type) => offers.find((offer) => offer.type === type).offers;
 
-const getDestinationByName = ((destinations, name) => destinations.find((item) => item.name === name));
+const getDestinationByName = ((destinations, name) => destinations.find((place) => place.name === name));
 
 const humanizeTripDueDate = (date) => dayjs(date).format('HH:mm');
 const humanizeTripDueDateTwo = (date) => dayjs(date).format('MMM D');
@@ -51,16 +49,6 @@ const sortTripByPrice = (tripA, tripB) => {
   }
   return 0;
 };
-
-// const sortTripByTime = (tripA, tripB) => {
-//   if (dayjs(tripA.dateTo).isAfter(dayjs(tripB.dateTo), 'm')) {
-//     return -1;
-//   }
-//   if (dayjs(tripA.dateTo).isBefore(dayjs(tripB.dateTo), 'm')) {
-//     return 1;
-//   }
-//   return 0;
-// };
 
 const sortTripByTime = (tripA, tripB) => {
   const diffA = Math.abs(getDurationTimeForSort(tripA.dateTo, tripA.dateFrom));

@@ -1,10 +1,8 @@
-// import { generateTrip } from '../fish/trip';
 import Observable from '../framework/observable.js';
 import {UpdateType} from '../const.js';
 import { getOffersByType } from '../utils/trip';
 
 export default class TripsModel extends Observable {
-  // #trips = Array.from({length: 5}, generateTrip);
   #trips = [];
   #allOffers = [];
   #destinations = [];
@@ -25,6 +23,7 @@ export default class TripsModel extends Observable {
     } catch(err) {
       this.#trips = [];
       this.#allOffers = [];
+      this.#destinations = [];
     }
 
     this._notify(UpdateType.INIT);
@@ -79,22 +78,32 @@ export default class TripsModel extends Observable {
     }
   };
 
+  addTrip = async (updateType, update) => {
+    try {
+      const response = await this.#tripsApiService.addTrip(update);
+      const newTrip = this.#adaptToClient(response, this.#allOffers);
+      this.#trips = [newTrip, ...this.#trips];
+      this._notify(updateType, newTrip);
 
-  addTrip = (updateType, update) => {
-    this.#trips = [update, ...this.#trips,];
-
-    this._notify(updateType, update);
+    } catch(err) {
+      throw new Error('Can\'t add trip');
+    }
   };
 
-  deleteTrip = (updateType, update) => {
+  deleteTrip = async (updateType, update) => {
     const index = this.#trips.findIndex((trip) => trip.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting trip');
     }
 
-    this.#trips = [...this.#trips.slice(0, index), ...this.#trips.slice(index + 1),];
+    try {
+      await this.#tripsApiService.deleteTrip(update);
+      this.#trips = [...this.#trips.slice(0, index), ...this.#trips.slice(index + 1),];
+      this._notify(updateType);
 
-    this._notify(updateType);
+    } catch(err) {
+      throw new Error('Can\'t delete trip');
+    }
   };
 }

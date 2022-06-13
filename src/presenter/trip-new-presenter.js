@@ -4,12 +4,9 @@ import {UserAction, UpdateType} from '../const.js';
 import dayjs from 'dayjs';
 
 // const currentTime = new Date();
-// const y = currentTime.getFullYear()%100;
-// const m = currentTime.getMonth()+1;
-// const d = currentTime.getDate();
-// const today = `${y} ${m} ${d}`;
+const today = dayjs(new Date());
 
-const today = dayjs();
+// const tom = dayjs(new Date(current.getTime() + 86400000));
 
 const newBlankTrip = {
   basePrice: '',
@@ -20,12 +17,11 @@ const newBlankTrip = {
     name: '',
     pictures: [
       {
-        src: '#',
+        src: '',
         description: '',
       }
     ]
   },
-  id: '',
   offers: [],
   type: '',
 };
@@ -36,23 +32,25 @@ export default class NewTripPresenter {
   #formComponent = null;
   #destroyCallback = null;
   #trip = newBlankTrip;
-  #allOffers = null;
+  #allOffersOfTrips = null;
+  #allDestinations = null;
 
-  constructor (listComponent, changeDate, alloffers) {
+  constructor (listComponent, changeDate) {
     this.#listComponent = listComponent;
     this.#changeData = changeDate;
-    this.#allOffers = alloffers;
   }
 
-  init = (callback, allOffers) => {
+  init = (callback, allOffers, destinations) => {
+    this.#allDestinations = destinations;
     this.#destroyCallback = callback;
+    this.#allOffersOfTrips = allOffers;
     this.#destroyCallback();
 
     if (this.#formComponent !== null) {
       return;
     }
 
-    this.#formComponent = new TripFormView(this.#trip, allOffers, true);
+    this.#formComponent = new TripFormView(this.#trip, this.#allOffersOfTrips, this.#allDestinations, true);
     this.#formComponent.setCloseFormClickHandler(this.destroy);
     this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#formComponent.setDeleteFormClickHandler(this.#handleDeleteClick);
@@ -83,11 +81,19 @@ export default class NewTripPresenter {
   };
 
   #handleFormSubmit = (trip) => {
-    this.#changeData(UserAction.ADD_TRIP, UpdateType.MAJOR, {id: '45645', ...trip});
-    this.destroy();
+    if(!trip.basePrice || !trip.type || !trip.destination.name) {return;}
+    this.#changeData(UserAction.ADD_TRIP, UpdateType.MAJOR, trip);
+    // this.destroy();
   };
 
   #handleDeleteClick = () => {
     this.destroy();
+  };
+
+  setSaving = () => {
+    this.#formComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
   };
 }
