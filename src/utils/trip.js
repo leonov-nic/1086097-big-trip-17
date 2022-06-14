@@ -24,9 +24,19 @@ const getDestinationByName = ((destinations, name) => destinations.find((place) 
 const humanizeTripDueDate = (date) => dayjs(date).format('HH:mm');
 const humanizeTripDueDateTwo = (date) => dayjs(date).format('MMM D');
 
-const getDurationTime = (dateto, datefrom) => `${Number(dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('MM')) > 1 ?
-  dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('M[Months] D[D] HH[H] mm[M]') :
-  dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('M[Month] DD[D] HH[H] mm[M]')}`;
+// const getDurationTime = (dateto, datefrom) => `${Number(dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('MM')) > 1 ?
+//   dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('M[Months] D[D] HH[H] mm[M]') :
+//   dayjs(dayjs(dateto).diff(dayjs(datefrom))).format('M[Month] DD[D] HH[H] mm[M]')}`;
+
+const getDurationTime = (dateto, datefrom) => {
+  const diffDay = dayjs(dateto).diff(dayjs(datefrom), 'day', true);
+  const diffHour = dayjs(dateto).diff(dayjs(datefrom), 'hour', true);
+  const days = Math.floor(diffDay);
+  const hours = Math.floor((diffDay - days) * 24);
+  const hoursTwo = Math.floor(diffHour);
+  const minutes = Math.floor((diffHour - hoursTwo) * 60);
+  return `${days}D ${hours}H ${minutes}M`;
+};
 
 const getDurationTimeForSort = (dateto, datefrom) => dayjs(dateto).diff(dayjs(datefrom));
 
@@ -65,7 +75,6 @@ const sortTripByTime = (tripA, tripB) => {
 const isTripExpiringToday = (datefrom) => datefrom && dayjs(datefrom).isSame(dayjs(), 'd') || datefrom && dayjs(datefrom).isAfter(dayjs(), 'd');
 const isTripOverdue = (dateto) => dateto && dayjs(dateto).isBefore(dayjs(), 'd');
 const isDateToNotCorrect = (datefrom, dateto) => dayjs(dateto).isBefore(dayjs(datefrom));
-// const isTripOverdue = (dateto) => dateto && dayjs(dateto).isAfter(dayjs(), 'd');
 
 export {
   humanizeTripDueDate,

@@ -36,7 +36,7 @@ const UpdateType = {
 };
 
 const NoTripsTextType = {
-  [FilterType.EVERYTHING]: 'Click «ADD NEW POINT» in menu to create your first trip',
+  [FilterType.EVERYTHING]: 'Click «NEW EVENT in menu to create your first trip',
   [FilterType.FUTURE]: 'There are no overdue trips now',
   [FilterType.PAST]: 'There are no trips today',
 };
@@ -53,4 +53,18 @@ const typesOfTrip = [
   'restaurant',
 ];
 
-export { typesOfTrip, Mode, SortType, UpdateType, UserAction, FilterType, NoTripsTextType, HTTPMethods };
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
+export {
+  typesOfTrip,
+  Mode,
+  SortType,
+  UpdateType,
+  UserAction,
+  FilterType,
+  NoTripsTextType,
+  HTTPMethods,
+  TimeLimit, };

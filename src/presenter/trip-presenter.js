@@ -34,7 +34,7 @@ export default class TripPresenter {
     const prevFormComponent = this.#formComponent;
 
     this.#tripComponent = new TripView(trip);
-    this.#formComponent = new TripFormView(trip, this.#allOffers, this.#allDestinations, false);
+    this.#formComponent = new TripFormView(trip, this.#allOffers, this.#allDestinations, false, this.#onEscKeyDown);
 
     this.#tripComponent.setToFormClickHandler(this.#replaceTripToForm);
     this.#tripComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
@@ -123,5 +123,22 @@ export default class TripPresenter {
         isDeleting: true,
       });
     }
+  };
+
+  setAborting = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#tripComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#formComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#formComponent.shake(resetFormState);
   };
 }

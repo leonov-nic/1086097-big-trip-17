@@ -1,12 +1,9 @@
 import { render, remove, RenderPosition } from '../framework/render';
 import { TripFormView } from '../view/trip-form-view';
-import {UserAction, UpdateType} from '../const.js';
+import { UserAction, UpdateType } from '../const';
 import dayjs from 'dayjs';
 
-// const currentTime = new Date();
 const today = dayjs(new Date());
-
-// const tom = dayjs(new Date(current.getTime() + 86400000));
 
 const newBlankTrip = {
   basePrice: '',
@@ -95,5 +92,17 @@ export default class NewTripPresenter {
       isDisabled: true,
       isSaving: true,
     });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#formComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#formComponent.shake(resetFormState);
   };
 }

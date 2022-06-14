@@ -15,9 +15,3 @@ const END_POINT = 'https://17.ecmascript.pages.academy/big-trip';
 const tripsModel = new TripsModel(new TripssApiService(END_POINT, AUTHORIZATION));
 const listPresenter = new ListPresenter(siteTripsContainer, siteFilterContainer, tripMainElement, tripsModel, new FilterModel);
 listPresenter.init();
-// tripsModel.init();
-
-// tripsModel.init()
-//   .finally(() => {
-//      this.#renderButtonNewTrip();
-//   });

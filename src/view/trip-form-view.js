@@ -140,12 +140,14 @@ export class TripFormView extends AbstractStatefulView {
   #newForm = false;
   #allOffers = null;
   #allDestinations = null;
+  #onEscKeyDown = null;
 
-  constructor(trip, allOffers, destinations, newForm = false) {
+  constructor(trip, allOffers, destinations, newForm = false, onEscKeyDown) {
     super();
     this.#allOffers = allOffers;
     this.#allDestinations = destinations;
     this.#newForm = newForm;
+    this.#onEscKeyDown = onEscKeyDown;
     this._state = TripFormView.parseTripToState(trip);
 
     this.#setInnerHandlers();
@@ -180,6 +182,7 @@ export class TripFormView extends AbstractStatefulView {
     this.#setDatepickerFrom();
 
     this.setAddDeleteOffers();
+    document.addEventListener('keydown', this.#onEscKeyDown);
   };
 
   get template() {

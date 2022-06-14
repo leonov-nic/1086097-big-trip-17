@@ -6,13 +6,10 @@ const createTripFilterTemplate = (filter, currentFilterType) => {
 
   const genetateFilters = () => (
     FilterType ? `${Object.values(FilterType).map((filterName) =>
-      `
-      <div class="trip-filters__filter">
+      `<div class="trip-filters__filter">
         <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter-${name}" value="${filterName}" ${currentFilterType === filterName ? 'checked' : ''}>
         <label class="trip-filters__filter-label" for="filter-${filterName}" data-filter="${filterName}">${filterName}</label>
-      </div>
-      `
-    ).join('')}` : ''
+      </div>`).join('')}` : ''
   );
 
   return (`
@@ -46,7 +43,6 @@ export class TripFilterView extends AbstractView {
   #filterTypeChangeHandler = (evt) => {
     if (evt.target.tagName !== 'LABEL') { return; }
     evt.preventDefault();
-    // console.log(evt.target.dataset.filter);
     this._callback.filterTypeChange(evt.target.dataset.filter);
   };
 }

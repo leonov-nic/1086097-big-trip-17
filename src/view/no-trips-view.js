@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { NoTripsTextType } from '../const.js';
+import { NoTripsTextType } from '../const';
 
 const createTripLoadingTemplate = (filterType) => {
 
