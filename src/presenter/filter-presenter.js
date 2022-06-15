@@ -10,7 +10,6 @@ export default class FilterPresenter {
   constructor(filterContainer, filterModel) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
-
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
@@ -31,11 +30,12 @@ export default class FilterPresenter {
     ];
   }
 
-  init = () => {
+  init = (tripsFuture) => {
+    const isSomeTripsFuture = tripsFuture;
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new TripFilterView(filters, this.#filterModel.filter);
+    this.#filterComponent = new TripFilterView(filters, this.#filterModel.filter, isSomeTripsFuture);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -55,7 +55,6 @@ export default class FilterPresenter {
     if (this.#filterModel.filter === filterType) {
       return;
     }
-
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
 }

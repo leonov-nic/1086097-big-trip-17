@@ -29,6 +29,7 @@ export class ListPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
+  #isSomeTripsFuture = false;
   #tripPresenter = new Map();
   #tripNewPresenter = null;
 
@@ -47,7 +48,7 @@ export class ListPresenter {
   init = () => {
     this.#tripNewPresenter = new NewTripPresenter(this.#tripListComponent.element, this.#handleViewAction);
     const filterPresenter = new FilterPresenter(this.#filterContainer, this.#filterModel);
-    filterPresenter.init();
+    filterPresenter.init(this.isSomeTripsFuture);
 
     this.#tripsModel.init()
       .finally(() => {
@@ -55,6 +56,11 @@ export class ListPresenter {
       });
     this.#renderListOfTrips();
   };
+
+  get isSomeTripsFuture() {
+    const trips = this.#tripsModel.trips;
+    return filter.Future(trips).length > 0;
+  }
 
   get allOffers() {
     const offers = this.#tripsModel.alloffers;
@@ -178,6 +184,7 @@ export class ListPresenter {
     this.#renderInfo();
     this.#renderSort();
     this.#renderTrips(this.trips);
+    this.#isSomeTripsFuture = this.isSomeTripsFuture;
   };
 
   #renderSort = () => {

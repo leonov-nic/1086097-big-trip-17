@@ -221,6 +221,7 @@ export class TripFormView extends AbstractStatefulView {
     this._setState({
       basePrice: Math.trunc(evt.target.value),
     });
+    document.addEventListener('keydown', this.#onEscKeyDown);
   };
 
   static parseTripToState = (trip) => (
