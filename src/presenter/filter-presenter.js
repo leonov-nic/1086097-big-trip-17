@@ -1,11 +1,12 @@
 import { render, replace, remove } from '../framework/render';
 import { TripFilterView } from '../view/trip-filter-view';
-import { FilterType, UpdateType } from '../const';
+import { UpdateType } from '../const';
 
 export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
   #filterComponent = null;
+  #filterLockValues = null;
 
   constructor(filterContainer, filterModel) {
     this.#filterContainer = filterContainer;
@@ -13,29 +14,10 @@ export default class FilterPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  get filters() {
-    return [
-      {
-        type: FilterType.EVERYTHING,
-        name: 'Everything',
-      },
-      {
-        type: FilterType.FUTURE,
-        name: 'Future',
-      },
-      {
-        type: FilterType.PAST,
-        name: 'Past',
-      },
-    ];
-  }
-
-  init = (tripsFuture) => {
-    const isSomeTripsFuture = tripsFuture;
-    const filters = this.filters;
+  init = () => {
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new TripFilterView(filters, this.#filterModel.filter, isSomeTripsFuture);
+    this.#filterComponent = new TripFilterView(this.#filterModel.filter);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -49,6 +31,11 @@ export default class FilterPresenter {
 
   #handleModelEvent = () => {
     this.init();
+  };
+
+  getFilterLockValues = (values) => {
+    this.#filterLockValues = values;
+    this.#filterComponent.setFilterLockValues(this.#filterLockValues)
   };
 
   #handleFilterTypeChange = (filterType) => {

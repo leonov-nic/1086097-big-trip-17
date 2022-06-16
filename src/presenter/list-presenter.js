@@ -29,9 +29,9 @@ export class ListPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
-  #isSomeTripsFuture = false;
   #tripPresenter = new Map();
   #tripNewPresenter = null;
+  #filterPresenter = null;
 
   constructor (tripContainer, filterContainer, mainContainer, tripsModel, filterModel) {
     this.#tripsModel = tripsModel;
@@ -44,11 +44,10 @@ export class ListPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-
   init = () => {
     this.#tripNewPresenter = new NewTripPresenter(this.#tripListComponent.element, this.#handleViewAction);
-    const filterPresenter = new FilterPresenter(this.#filterContainer, this.#filterModel);
-    filterPresenter.init(this.isSomeTripsFuture);
+    this.#filterPresenter = new FilterPresenter(this.#filterContainer, this.#filterModel);
+    this.#filterPresenter.init();
 
     this.#tripsModel.init()
       .finally(() => {
@@ -57,9 +56,9 @@ export class ListPresenter {
     this.#renderListOfTrips();
   };
 
-  get isSomeTripsFuture() {
+  get isSomeTripsFutureAndPast() {
     const trips = this.#tripsModel.trips;
-    return filter.Future(trips).length > 0;
+    return {future: filter.Future(trips).length > 1, past: filter.Past(trips).length > 1};
   }
 
   get allOffers() {
@@ -75,6 +74,7 @@ export class ListPresenter {
   get trips() {
     this.#filterType = this.#filterModel.filter;
     const trips = this.#tripsModel.trips;
+    this.#filterPresenter.getFilterLockValues(this.isSomeTripsFutureAndPast);
 
     const filteredTrips = filter[this.#filterType](trips);
 
@@ -184,7 +184,6 @@ export class ListPresenter {
     this.#renderInfo();
     this.#renderSort();
     this.#renderTrips(this.trips);
-    this.#isSomeTripsFuture = this.isSomeTripsFuture;
   };
 
   #renderSort = () => {

@@ -1,13 +1,12 @@
 import AbstractView from '../framework/view/abstract-view';
 import { FilterType } from '../const';
 
-const createTripFilterTemplate = (filter, currentFilterType) => {
-  const {name} = filter;
+const createTripFilterTemplate = (currentFilterType) => {
 
   const genetateFilters = () => (
     FilterType ? `${Object.values(FilterType).map((filterName) =>
       `<div class="trip-filters__filter">
-        <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter-${name}" value="${filterName}" ${currentFilterType === filterName ? 'checked' : ''}>
+        <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter-${filterName}" value="${filterName}" ${currentFilterType === filterName ? 'checked' : ''}>
         <label class="trip-filters__filter-label" for="filter-${filterName}" data-filter="${filterName}">${filterName}</label>
       </div>`).join('')}` : ''
   );
@@ -23,16 +22,23 @@ const createTripFilterTemplate = (filter, currentFilterType) => {
 
 export class TripFilterView extends AbstractView {
   #currentFilterType = null;
-  #filters = null;
+  #filterLock = null;
 
-  constructor(filters, currentFilterType) {
+  constructor(currentFilterType) {
     super();
     this.#currentFilterType = currentFilterType;
-    this.#filters = filters;
+  }
+
+  setFilterLockValues = (filter) => {
+    this.#filterLock = filter;
+  };
+
+  get filterBoolen() {
+    return this.#filterLock;
   }
 
   get template() {
-    return createTripFilterTemplate(this.#filters, this.#currentFilterType);
+    return createTripFilterTemplate(this.#currentFilterType, this.#filterLock);
   }
 
   setFilterTypeChangeHandler = (callback) => {
