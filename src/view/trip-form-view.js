@@ -211,7 +211,6 @@ export class TripFormView extends AbstractStatefulView {
     this.updateElement({
       type: evt.target.textContent,
     });
-    // repeating: {...this._state.repeating, [evt.target.value]: evt.target.checked},
   };
 
   #priceChangeHandler = (evt) => {

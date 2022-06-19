@@ -14,10 +14,10 @@ export default class FilterPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  init = () => {
+  init = (filterLockValues) => {
     const prevFilterComponent = this.#filterComponent;
-
-    this.#filterComponent = new TripFilterView(this.#filterModel.filter);
+    this.#filterLockValues = filterLockValues;
+    this.#filterComponent = new TripFilterView(this.#filterModel.filter, this.#filterLockValues);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -30,12 +30,7 @@ export default class FilterPresenter {
   };
 
   #handleModelEvent = () => {
-    this.init();
-  };
-
-  getFilterLockValues = (values) => {
-    this.#filterLockValues = values;
-    this.#filterComponent.setFilterLockValues(this.#filterLockValues)
+    this.init(this.#filterLockValues);
   };
 
   #handleFilterTypeChange = (filterType) => {

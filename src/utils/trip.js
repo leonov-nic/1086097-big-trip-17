@@ -69,7 +69,7 @@ const sortTripByTime = (tripA, tripB) => {
 };
 
 const isTripExpiringToday = (datefrom) => datefrom && dayjs(datefrom).isSame(dayjs(), 'd') || datefrom && dayjs(datefrom).isAfter(dayjs(), 'd');
-const isTripOverdue = (dateto) =>  dateto && dayjs(dateto).isAfter(dayjs(), 'd');
+const isTripOverdue = (dateto) =>  dateto && dayjs(dateto).isBefore(dayjs(), 'D');
 const isDateToNotCorrect = (datefrom, dateto) => dayjs(dateto).isBefore(dayjs(datefrom));
 
 export {

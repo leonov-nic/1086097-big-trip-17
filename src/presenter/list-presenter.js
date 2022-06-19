@@ -47,8 +47,6 @@ export class ListPresenter {
   init = () => {
     this.#tripNewPresenter = new NewTripPresenter(this.#tripListComponent.element, this.#handleViewAction);
     this.#filterPresenter = new FilterPresenter(this.#filterContainer, this.#filterModel);
-    this.#filterPresenter.init();
-
     this.#tripsModel.init()
       .finally(() => {
         this.#renderButtonNewTrip();
@@ -56,10 +54,10 @@ export class ListPresenter {
     this.#renderListOfTrips();
   };
 
-  get isSomeTripsFutureAndPast() {
+  #isSomeTripsFutureAndPast = () => {
     const trips = this.#tripsModel.trips;
-    return {future: filter.Future(trips).length > 1, past: filter.Past(trips).length > 1};
-  }
+    return {Future: filter.Future(trips).length > 0, Past: filter.Past(trips).length > 0};
+  };
 
   get allOffers() {
     const offers = this.#tripsModel.alloffers;
@@ -74,7 +72,6 @@ export class ListPresenter {
   get trips() {
     this.#filterType = this.#filterModel.filter;
     const trips = this.#tripsModel.trips;
-    this.#filterPresenter.getFilterLockValues(this.isSomeTripsFutureAndPast);
 
     const filteredTrips = filter[this.#filterType](trips);
 
@@ -130,16 +127,19 @@ export class ListPresenter {
       case UpdateType.MINOR:
         this.#clearList();
         this.#renderListOfTrips();
+        this.#filterPresenter.init(this.#isSomeTripsFutureAndPast());
         break;
       case UpdateType.MAJOR:
         this.#clearList({resetSortType: true});
         this.#renderListOfTrips();
+        this.#filterPresenter.init(this.#isSomeTripsFutureAndPast());
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
         this.#clearList();
         this.#renderListOfTrips();
+        this.#filterPresenter.init(this.#isSomeTripsFutureAndPast());
         break;
     }
   };
