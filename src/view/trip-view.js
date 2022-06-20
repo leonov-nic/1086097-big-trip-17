@@ -61,7 +61,7 @@ const createTripTemplate = (trip) => {
   `);
 };
 
-export class TripView extends AbstractView {
+export default class TripView extends AbstractView {
   #trip = null;
 
   constructor(trip) {

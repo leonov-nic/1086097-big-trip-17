@@ -1,5 +1,5 @@
 import ApiService from './framework/api-service';
-import { HTTPMethods } from './const';
+import { HTTPMethod } from './const';
 
 export default class TripsApiService extends ApiService {
   get trips() {
@@ -20,7 +20,7 @@ export default class TripsApiService extends ApiService {
   updateTrip = async (trip) => {
     const response = await this._load({
       url: `points/${trip.id}`,
-      method: HTTPMethods.PUT,
+      method: HTTPMethod.PUT,
       body: JSON.stringify(this.#adaptToServer(trip)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });
@@ -33,7 +33,7 @@ export default class TripsApiService extends ApiService {
   addTrip = async (trip) => {
     const response = await this._load({
       url: 'points',
-      method: HTTPMethods.POST,
+      method: HTTPMethod.POST,
       body: JSON.stringify(this.#adaptToServer(trip)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });
@@ -46,7 +46,7 @@ export default class TripsApiService extends ApiService {
   deleteTrip = async (trip) => {
     await this._load({
       url: `points/${trip.id}`,
-      method: 'DELETE',
+      method: HTTPMethod.DELETE,
     });
   };
 

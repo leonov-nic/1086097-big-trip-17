@@ -1,5 +1,5 @@
 import { render, remove, RenderPosition } from '../framework/render';
-import { TripFormView } from '../view/trip-form-view';
+import TripFormView from '../view/trip-form-view';
 import { UserAction, UpdateType } from '../const';
 import dayjs from 'dayjs';
 

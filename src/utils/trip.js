@@ -7,15 +7,13 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 dayjs.extend(isSameOrAfter);
 
 const createPeriodOfTrips = (trips) => {
-  const arrayOfDateFrom = trips.map((trip) => dayjs(trip.dateFrom));
-  const arrayOfDateTo = trips.map((trip) => dayjs(trip.dateTo));
+  const allStartDates = trips.map((trip) => dayjs(trip.dateFrom));
+  const allFinishDates = trips.map((trip) => dayjs(trip.dateTo));
 
-  if (arrayOfDateFrom.length && arrayOfDateTo.length) {
-    return `${dayjs.min([...arrayOfDateFrom]).format('MMM D')} – ${dayjs.max([...arrayOfDateTo]).format('MMM D')}`;
+  if (allStartDates && allFinishDates) {
+    return `${dayjs.min([...allStartDates]).format('D MMM')} – ${dayjs.max([...allFinishDates]).format('D MMM')}`;
   }
 };
-
-const isDatesEqual = (dateA, dateB) => dayjs(dateA).isSame(dateB);
 
 const getOffersByType = (offers, type) => offers.find((offer) => offer.type === type).offers;
 
@@ -68,8 +66,8 @@ const sortTripByTime = (tripA, tripB) => {
   return 0;
 };
 
-const isTripExpiringToday = (datefrom) => datefrom && dayjs(datefrom).isSame(dayjs(), 'd') || datefrom && dayjs(datefrom).isAfter(dayjs(), 'd');
-const isTripOverdue = (dateto) =>  dateto && dayjs(dateto).isBefore(dayjs(), 'D');
+const isTripExpiringToday = (datefrom, dateto) => datefrom && dayjs(datefrom).isSame(dayjs(), 'd') || datefrom && dayjs(datefrom).isAfter(dayjs(), 'd') || dateto && datefrom && dayjs(datefrom).isBefore(dayjs(), 'D') && dayjs(dateto).isAfter(dayjs(), 'D');
+const isTripOverdue = (dateto, datefrom) =>  dateto && dayjs(dateto).isBefore(dayjs(), 'D') || dateto && datefrom && dayjs(datefrom).isBefore(dayjs(), 'D') && dayjs(dateto).isAfter(dayjs(), 'D');
 const isDateToNotCorrect = (datefrom, dateto) => dayjs(dateto).isBefore(dayjs(datefrom));
 
 export {
@@ -84,6 +82,5 @@ export {
   sortTripByTime,
   sortTripByDate,
   getOffersByType,
-  getDestinationByName,
-  isDatesEqual
+  getDestinationByName
 };

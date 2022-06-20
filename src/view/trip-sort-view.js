@@ -30,7 +30,7 @@ const createTripSortTemplate = (currentSortType) => (`
   </form>
   `);
 
-export class tripSortView extends AbstractView {
+export default class tripSortView extends AbstractView {
   #currentSortType = null;
 
   constructor(currentSortType) {
@@ -49,6 +49,8 @@ export class tripSortView extends AbstractView {
 
   #sortTypeClickHandler = (evt) => {
     if (evt.target.tagName !== 'LABEL') { return; }
+    if(evt.target.textContent === 'Event') { return; }
+    if(evt.target.textContent === 'Offers') { return; }
     evt.preventDefault();
     this._callback.selectSortType(evt.target.dataset.sort);
   };

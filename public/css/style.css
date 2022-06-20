@@ -410,7 +410,6 @@ main {
   line-height: 21px; }
   .event--edit {
     display: block;
-    min-height: 483px;
     margin-left: 80px;
     padding: 0;
     background-color: #ffffff;
@@ -494,6 +493,7 @@ main {
   margin-bottom: 5px; }
 
 .event__type-label {
+  text-transform: capitalize;
   position: relative;
   display: block;
   padding: 5px 10px 5px 62px;

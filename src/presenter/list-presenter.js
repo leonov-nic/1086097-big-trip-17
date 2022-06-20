@@ -1,7 +1,10 @@
 import { render, RenderPosition, remove } from '../framework/render';
+import { sortTripByPrice, sortTripByTime, sortTripByDate } from '../utils/trip';
+import {filter} from '../utils/filter';
+import { SortType, UpdateType, UserAction, FilterType, TimeLimit } from '../const';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
-import { tripSortView } from '../view/trip-sort-view';
-import { TripListView } from '../view/trip-list-view';
+import tripSortView from '../view/trip-sort-view';
+import TripListView from '../view/trip-list-view';
 import NoTripsView from '../view/no-trips-view';
 import TripInfoView from '../view/trip-info-view';
 import NewEventButtonView from '../view/new-event-button-view';
@@ -9,11 +12,8 @@ import TripLoadingView from '../view/trip-loading-view';
 import TripPresenter from './trip-presenter';
 import FilterPresenter from './filter-presenter';
 import NewTripPresenter from './trip-new-presenter';
-import { sortTripByPrice, sortTripByTime, sortTripByDate } from '../utils/trip';
-import {filter} from '../utils/filter';
-import { SortType, UpdateType, UserAction, FilterType, TimeLimit } from '../const';
 
-export class ListPresenter {
+export default class ListPresenter {
   #newEventButtonViewComponent = null;
   #sortComponent = null;
   #infoComponent = null;

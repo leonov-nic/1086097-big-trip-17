@@ -23,7 +23,7 @@ const createTripFilterTemplate = (currentFilterType, filterLockValues) => {
   `);
 };
 
-export class TripFilterView extends AbstractView {
+export default class TripFilterView extends AbstractView {
   #currentFilterType = null;
   #filterLock = null;
   #filterLockValues = {};
@@ -32,14 +32,6 @@ export class TripFilterView extends AbstractView {
     super();
     this.#filterLockValues = filterLockValues;
     this.#currentFilterType = currentFilterType;
-  }
-
-  setFilterLockValues = (filter) => {
-    this.#filterLock = filter;
-  };
-
-  get filterBoolen() {
-    return this.#filterLock;
   }
 
   get template() {

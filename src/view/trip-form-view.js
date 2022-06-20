@@ -103,28 +103,28 @@ const createTripFormTemplate = (trip, alloffers, alldestinations, newForm) => {
             <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'saving...' : 'save'}</button>
-          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${newForm ? 'Cancel' : `${isDeleting ? 'deleting...' : 'delete'}`} </button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${newForm ? 'Cancel' : `${isDeleting ? 'Deleting...' : 'Delete'}`} </button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
 
         <section class="event__details">
-          <section class="event__section  event__section--offers">
-            <h3 class="event__section-title  event__section-title--offers">${offersByType.length ? 'Offers' : ''}</h3>
+          <section class="event__section  event__section--offers ${offersByType.length === 0 ? 'visually-hidden' : ''}">
+            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
             <div class="event__available-offers">
               ${createOffersOfTrip()}
             </div>
           </section>
 
-          <section class="event__section  event__section--destination">
+          <section class="event__section  event__section--destination ${Object.keys(destination).length ? '' : 'visually-hidden'}">
 
             <h3 class="event__section-title  event__section-title--destination">${destination ? destination.name : ''}</h3>
             <p class="event__destination-description">${destination ? destination.description : ''}</p>
             <div class="event__photos-container">
 
-            <div class="event__photos-tape">
+            <div class="event__photos-tape ${destination.pictures.length === 0 ? 'visually-hidden' : ''}">
               ${createPicturesOfTrip()}
             </div>
           </div>
@@ -135,7 +135,7 @@ const createTripFormTemplate = (trip, alloffers, alldestinations, newForm) => {
   `);
 };
 
-export class TripFormView extends AbstractStatefulView {
+export default class TripFormView extends AbstractStatefulView {
   #datepicker = null;
   #newForm = false;
   #allOffers = null;
@@ -210,6 +210,7 @@ export class TripFormView extends AbstractStatefulView {
     if (evt.target.tagName !== 'LABEL') { return; }
     this.updateElement({
       type: evt.target.textContent,
+      offers: [],
     });
   };
 

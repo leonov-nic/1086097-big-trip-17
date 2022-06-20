@@ -2,8 +2,8 @@ import AbstractView from '../framework/view/abstract-view';
 import { createPeriodOfTrips }  from '../utils/trip';
 
 const createTripInfoTemplate = (trips) => {
-  const period = trips.length ? createPeriodOfTrips(trips) : '';
-
+  const period = trips.length > 0 ? createPeriodOfTrips(trips) : '';
+  const MAX_LENGTH_OF_THE_DISPLAYED_JOURNEY = 3;
   const namesOfDestination = trips.map((item) => item.destination.name);
   const threeNamesOfDestination = trips.map((item) => item.destination.name).join(' — ');
 
@@ -24,7 +24,7 @@ const createTripInfoTemplate = (trips) => {
   return (`
     <section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
-        <h1 class="trip-info__title">${trips.length > 3 ? `${namesOfDestination.slice(0, 1)} —...— ${namesOfDestination.slice(-1)}` : threeNamesOfDestination}</h1>
+        <h1 class="trip-info__title">${trips.length > MAX_LENGTH_OF_THE_DISPLAYED_JOURNEY ? `${namesOfDestination.slice(0, 1)} —...— ${namesOfDestination.slice(-1)}` : threeNamesOfDestination}</h1>
 
         <p class="trip-info__dates">${period}</p>
       </div>

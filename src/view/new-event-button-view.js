@@ -5,7 +5,6 @@ const createNewEventButton = () => (
   `);
 
 export default class NewEventButtonView extends AbstractView {
-
   constructor () {
     super();
   }

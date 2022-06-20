@@ -1,8 +1,8 @@
 import { render, replace, remove } from '../framework/render';
-import { TripFormView } from '../view/trip-form-view';
-import { TripView } from '../view/trip-view';
 import { isEscKeyDown } from '../utils/common';
-import {UserAction, UpdateType, Mode} from '../const.js';
+import { UserAction, UpdateType, Mode } from '../const';
+import TripFormView from '../view/trip-form-view';
+import TripView from '../view/trip-view';
 
 export default class TripPresenter {
   #trip = null;

@@ -1,4 +1,4 @@
-const HTTPMethods = {
+const HTTPMethod = {
   GET: 'GET',
   PUT: 'PUT',
   DELETE: 'DELETE',
@@ -36,9 +36,9 @@ const UpdateType = {
 };
 
 const NoTripsTextType = {
-  [FilterType.EVERYTHING]: 'Click «NEW EVENT in menu to create your first trip',
-  [FilterType.FUTURE]: 'There are no overdue trips now',
-  [FilterType.PAST]: 'There are no trips today',
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.FUTURE]: 'There are no future events now',
+  [FilterType.PAST]: 'There are no past events now',
 };
 
 const typesOfTrip = [
@@ -66,5 +66,5 @@ export {
   UserAction,
   FilterType,
   NoTripsTextType,
-  HTTPMethods,
+  HTTPMethod,
   TimeLimit, };
