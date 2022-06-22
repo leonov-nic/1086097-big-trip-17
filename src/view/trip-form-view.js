@@ -202,6 +202,7 @@ export default class TripFormView extends AbstractStatefulView {
       this.#datepickerTo.destroy();
       this.#datepickerTo = null;
     }
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   reset = (trip) => {
@@ -294,7 +295,6 @@ export default class TripFormView extends AbstractStatefulView {
   #closeFormClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
-    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   setFormSubmitHandler = (callback) => {
@@ -305,7 +305,6 @@ export default class TripFormView extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this._callback.formSubmit(TripFormView.parseStateToTrip(this._state));
-    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   #setInnerHandlers = () => {
@@ -317,13 +316,11 @@ export default class TripFormView extends AbstractStatefulView {
   setDeleteFormClickHandler = (callback) => {
     this._callback.deleteFormClick = callback;
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
-    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   #formDeleteClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.deleteFormClick(TripFormView.parseStateToTrip(this._state));
-    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   setAddDeleteOffersHandler = () => {
