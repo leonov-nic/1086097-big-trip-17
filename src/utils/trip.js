@@ -1,9 +1,7 @@
 import dayjs from 'dayjs';
 import minMax from 'dayjs/plugin/minMax';
-dayjs.extend(minMax);
-
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-
+dayjs.extend(minMax);
 dayjs.extend(isSameOrAfter);
 
 const createPeriodOfTrips = (trips) => {
@@ -33,38 +31,9 @@ const getDurationTime = (dateto, datefrom) => {
 };
 
 const getDurationTimeForSort = (dateto, datefrom) => dayjs(dateto).diff(dayjs(datefrom));
-
-const sortTripByDate = (tripA, tripB) => {
-  if (tripA.dateFrom > tripB.dateFrom) {
-    return 1;
-  }
-  if (tripA.dateFrom < tripB.dateFrom) {
-    return -1;
-  }
-  return 0;
-};
-
-const sortTripByPrice = (tripA, tripB) => {
-  if (tripA.basePrice > tripB.basePrice) {
-    return -1;
-  }
-  if (tripA.basePrice < tripB.basePrice) {
-    return 1;
-  }
-  return 0;
-};
-
-const sortTripByTime = (tripA, tripB) => {
-  const diffA = Math.abs(getDurationTimeForSort(tripA.dateTo, tripA.dateFrom));
-  const diffB = Math.abs(getDurationTimeForSort(tripB.dateTo, tripB.dateFrom));
-  if (diffA > diffB) {
-    return -1;
-  }
-  if (diffA < diffB) {
-    return 1;
-  }
-  return 0;
-};
+const sortTripByDate = (tripA, tripB) => dayjs(tripA.dateFrom) - dayjs(tripB.dateFrom);
+const sortTripByPrice = (tripA, tripB) => tripB.basePrice - tripA.basePrice;
+const sortTripByTime = (tripA, tripB) =>  getDurationTimeForSort(tripB.dateTo, tripB.dateFrom) - getDurationTimeForSort(tripA.dateTo, tripA.dateFrom);
 
 const isTripExpiringToday = (datefrom, dateto) => datefrom && dayjs(datefrom).isSame(dayjs(), 'd') || datefrom && dayjs(datefrom).isAfter(dayjs(), 'd') || dateto && datefrom && dayjs(datefrom).isBefore(dayjs(), 'D') && dayjs(dateto).isAfter(dayjs(), 'D');
 const isTripOverdue = (dateto, datefrom) =>  dateto && dayjs(dateto).isBefore(dayjs(), 'D') || dateto && datefrom && dayjs(datefrom).isBefore(dayjs(), 'D') && dayjs(dateto).isAfter(dayjs(), 'D');

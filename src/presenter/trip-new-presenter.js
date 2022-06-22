@@ -49,12 +49,12 @@ export default class NewTripPresenter {
 
     this.#formComponent = new TripFormView(this.#trip, this.#allOffersOfTrips, this.#allDestinations, true);
     this.#formComponent.setCloseFormClickHandler(this.destroy);
+    this.#formComponent.setOnEscKeyDown(this.destroy);
     this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#formComponent.setDeleteFormClickHandler(this.#handleDeleteClick);
-    this.#formComponent.setAddDeleteOffers();
+    this.#formComponent.setAddDeleteOffersHandler();
 
     render(this.#formComponent, this.#listComponent, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#onEscKeyDown);
   };
 
   destroy = () => {
@@ -63,28 +63,8 @@ export default class NewTripPresenter {
     }
 
     this.#destroyCallback?.();
-
     remove(this.#formComponent);
     this.#formComponent = null;
-    document.removeEventListener('keydown', this.#onEscKeyDown);
-  };
-
-  #onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.destroy();
-    }
-    document.removeEventListener('keydown', this.#onEscKeyDown);
-  };
-
-  #handleFormSubmit = (trip) => {
-    if(!trip.basePrice || !trip.type || !trip.destination.name) {return;}
-    this.#changeData(UserAction.ADD_TRIP, UpdateType.MAJOR, trip);
-    // this.destroy();
-  };
-
-  #handleDeleteClick = () => {
-    this.destroy();
   };
 
   setSaving = () => {
@@ -104,5 +84,15 @@ export default class NewTripPresenter {
     };
 
     this.#formComponent.shake(resetFormState);
+  };
+
+  #handleFormSubmit = (trip) => {
+    if(!trip.basePrice || !trip.type || !trip.destination.name) {return;}
+    this.#changeData(UserAction.ADD_TRIP, UpdateType.MAJOR, trip);
+    // this.destroy();
+  };
+
+  #handleDeleteClick = () => {
+    this.destroy();
   };
 }

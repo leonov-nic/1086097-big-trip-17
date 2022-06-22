@@ -1,8 +1,8 @@
 import { render, RenderPosition, remove } from '../framework/render';
 import { sortTripByPrice, sortTripByTime, sortTripByDate } from '../utils/trip';
-import {filter} from '../utils/filter';
+import { filter } from '../utils/filter';
 import { SortType, UpdateType, UserAction, FilterType, TimeLimit } from '../const';
-import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import tripSortView from '../view/trip-sort-view';
 import TripListView from '../view/trip-list-view';
 import NoTripsView from '../view/no-trips-view';
@@ -54,11 +54,6 @@ export default class ListPresenter {
     this.#renderListOfTrips();
   };
 
-  #isSomeTripsFutureAndPast = () => {
-    const trips = this.#tripsModel.trips;
-    return {Future: filter.Future(trips).length > 0, Past: filter.Past(trips).length > 0};
-  };
-
   get allOffers() {
     const offers = this.#tripsModel.alloffers;
     return offers;
@@ -85,6 +80,11 @@ export default class ListPresenter {
     }
     return filteredTrips;
   }
+
+  #isSomeTripsFutureAndPast = () => {
+    const trips = this.#tripsModel.trips;
+    return {Future: filter.Future(trips).length > 0, Past: filter.Past(trips).length > 0};
+  };
 
   #handleViewAction = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
@@ -222,9 +222,7 @@ export default class ListPresenter {
   };
 
   #renderTrips = (trips) => {
-    for (let i = 0; i < trips.length; i++) {
-      this.#renderTrip(trips[i]);
-    }
+    trips.forEach((trip) => this.#renderTrip(trip));
   };
 
   #renderTrip = (trip) => {

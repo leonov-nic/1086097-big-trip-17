@@ -2,6 +2,7 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTripDueFullDate } from '../utils/trip-form';
 import { getOffersByType, getDestinationByName, isDateToNotCorrect } from '../utils/trip';
 import { typesOfTrip } from '../const';
+import { isEscKeyDown } from '../utils/common';
 
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -18,7 +19,6 @@ const createTripFormTemplate = (trip, alloffers, alldestinations, newForm) => {
   const newDateTo = humanizeTripDueFullDate(dateTo);
 
   const currentTripOffers = offers ? Object.values(offers) : [];
-
 
   const createDestinationsNameOfTrip = () => (
     destinations ? destinations.map((place) => (`<option value="${place.name}"></option>`)).join('\n') : []
@@ -136,7 +136,8 @@ const createTripFormTemplate = (trip, alloffers, alldestinations, newForm) => {
 };
 
 export default class TripFormView extends AbstractStatefulView {
-  #datepicker = null;
+  #datepickerTo = null;
+  #datepickerFrom = null;
   #newForm = false;
   #allOffers = null;
   #allDestinations = null;
@@ -156,20 +157,9 @@ export default class TripFormView extends AbstractStatefulView {
     this.#setDatepickerFrom();
   }
 
-  removeElement = () => {
-    super.removeElement();
-
-    if (this.#datepicker) {
-      this.#datepicker.destroy();
-      this.#datepicker = null;
-    }
-  };
-
-  reset = (trip) => {
-    this.updateElement(
-      TripFormView.parseTripToState(trip),
-    );
-  };
+  get template() {
+    return createTripFormTemplate(this._state, this.#allOffers, this.#allDestinations, this.#newForm);
+  }
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
@@ -181,13 +171,86 @@ export default class TripFormView extends AbstractStatefulView {
     this.#setDatepickerTo();
     this.#setDatepickerFrom();
 
-    this.setAddDeleteOffers();
-    document.addEventListener('keydown', this.#onEscKeyDown);
+    this.setAddDeleteOffersHandler();
+
+    if (!this.#newForm) {
+      document.addEventListener('keydown', this.#onEscKeyDown);
+    }
   };
 
-  get template() {
-    return createTripFormTemplate(this._state, this.#allOffers, this.#allDestinations, this.#newForm);
-  }
+  setOnEscKeyDown = (callback) => {
+    this._callback.escKeyDown = callback;
+    if (this.#newForm) {
+      document.addEventListener('keydown', this.#setOnEscKeyDownHandler);
+    }
+  };
+
+  #setOnEscKeyDownHandler = (evt) => {
+    isEscKeyDown(evt, this._callback.escKeyDown);
+    document.removeEventListener('keydown', this.#setOnEscKeyDownHandler);
+  };
+
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#datepickerFrom) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+
+    if (this.#datepickerTo) {
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
+    }
+  };
+
+  reset = (trip) => {
+    this.updateElement(
+      TripFormView.parseTripToState(trip),
+    );
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    if (isDateToNotCorrect(this._state.dateFrom, userDate)) {
+      this.updateElement({
+        dateTo: this._state.dateFrom,
+      });
+      return;
+    }
+
+    this.updateElement({
+      dateTo: userDate,
+    });
+  };
+
+  #dateFromChangeHandler = ([userDate]) => {
+    if (isDateToNotCorrect(userDate, this._state.dateTo)) {
+      this.updateElement({
+        dateFrom: this._state.dateTo,
+      });
+      return;
+    }
+
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #setDatepickerFrom = () => {
+    if (this._state.dateFrom) {
+      this.#datepickerFrom = flatpickr(this.element.querySelector('input[name="event-start-time"]'),
+        {dateFormat: 'y/m/d H:i', defaultDate: this._state.dateFrom, onChange: this.#dateFromChangeHandler, enableTime: true,},
+      );
+    }
+  };
+
+  #setDatepickerTo = () => {
+    if (this._state.dateTo) {
+      this.#datepickerTo = flatpickr(this.element.querySelector('input[name="event-end-time"]'),
+        {dateFormat: 'y/m/d H:i', defaultDate: this._state.dateTo, onChange: this.#dateToChangeHandler, enableTime: true,},
+      );
+    }
+  };
 
   #placeChangeHandler = (evt) => {
     if (this.#allDestinations && this.#allDestinations.some((element) => element.name === evt.target.value)) {
@@ -221,21 +284,6 @@ export default class TripFormView extends AbstractStatefulView {
     this._setState({
       basePrice: Math.trunc(evt.target.value),
     });
-    document.addEventListener('keydown', this.#onEscKeyDown);
-  };
-
-  static parseTripToState = (trip) => (
-    {...trip, isDisabled: false, isSaving: false, isDeleting: false,}
-  );
-
-  static parseStateToTrip = (state) => {
-    const trip = {...state};
-
-    delete trip.isDisabled;
-    delete trip.isSaving;
-    delete trip.isDeleting;
-
-    return trip;
   };
 
   setCloseFormClickHandler = (callback) => {
@@ -246,6 +294,7 @@ export default class TripFormView extends AbstractStatefulView {
   #closeFormClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   setFormSubmitHandler = (callback) => {
@@ -256,6 +305,7 @@ export default class TripFormView extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this._callback.formSubmit(TripFormView.parseStateToTrip(this._state));
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   #setInnerHandlers = () => {
@@ -264,59 +314,19 @@ export default class TripFormView extends AbstractStatefulView {
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceChangeHandler);
   };
 
-  #dateToChangeHandler = ([userDate]) => {
-    if (isDateToNotCorrect(this._state.dateFrom, userDate)) {
-      this.updateElement({
-        dateTo: this._state.dateFrom,
-      });
-      return;
-    }
-
-    this.updateElement({
-      dateTo: userDate,
-    });
-  };
-
-  #dateFromChangeHandler = ([userDate]) => {
-    if (isDateToNotCorrect(userDate, this._state.dateTo)) {
-      this.updateElement({
-        dateFrom: this._state.dateTo,
-      });
-      return;
-    }
-
-    this.updateElement({
-      dateFrom: userDate,
-    });
-  };
-
-  #setDatepickerFrom = () => {
-    if (this._state.dateFrom) {
-      this.#datepicker = flatpickr(this.element.querySelector('input[name="event-start-time"]'),
-        {dateFormat: 'y/m/d H:i', defaultDate: this._state.dateFrom, onChange: this.#dateFromChangeHandler, enableTime: true,},
-      );
-    }
-  };
-
-  #setDatepickerTo = () => {
-    if (this._state.dateTo) {
-      this.#datepicker = flatpickr(this.element.querySelector('input[name="event-end-time"]'),
-        {dateFormat: 'y/m/d H:i', defaultDate: this._state.dateTo, onChange: this.#dateToChangeHandler, enableTime: true,},
-      );
-    }
-  };
-
   setDeleteFormClickHandler = (callback) => {
     this._callback.deleteFormClick = callback;
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   #formDeleteClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.deleteFormClick(TripFormView.parseStateToTrip(this._state));
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
-  setAddDeleteOffers = () => {
+  setAddDeleteOffersHandler = () => {
     this.element.querySelector('.event__available-offers').addEventListener('change', this.#changeTheQuantityOffersOfTripHandler);
   };
 
@@ -335,5 +345,19 @@ export default class TripFormView extends AbstractStatefulView {
         offers: [...this._state.offers.filter((offer) => offer.title !== nameOfTheSelectedOffer)],
       });
     }
+  };
+
+  static parseTripToState = (trip) => (
+    {...trip, isDisabled: false, isSaving: false, isDeleting: false,}
+  );
+
+  static parseStateToTrip = (state) => {
+    const trip = {...state};
+
+    delete trip.isDisabled;
+    delete trip.isSaving;
+    delete trip.isDeleting;
+
+    return trip;
   };
 }

@@ -37,7 +37,7 @@ export default class TripPresenter {
     this.#formComponent.setCloseFormClickHandler(this.#replaceFormToTrip);
     this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#formComponent.setDeleteFormClickHandler(this.#handleDeleteClick);
-    this.#formComponent.setAddDeleteOffers();
+    this.#formComponent.setAddDeleteOffersHandler();
 
     if (prevTripComponent === null || prevFormComponent === null) {
       render(this.#tripComponent, this.#tripListComponent);
@@ -72,8 +72,8 @@ export default class TripPresenter {
     this.#formComponent.reset(this.#trip);
     replace(this.#tripComponent, this.#formComponent);
 
-    document.removeEventListener('keydown', this.#onEscKeyDown);
     this.#mode = Mode.DEFAULT;
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   #replaceTripToForm = () => {

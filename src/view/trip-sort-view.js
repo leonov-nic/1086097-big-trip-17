@@ -48,9 +48,7 @@ export default class tripSortView extends AbstractView {
   };
 
   #sortTypeClickHandler = (evt) => {
-    if (evt.target.tagName !== 'LABEL') { return; }
-    if(evt.target.textContent === 'Event') { return; }
-    if(evt.target.textContent === 'Offers') { return; }
+    if (evt.target.tagName !== 'LABEL' || evt.target.textContent === 'Event' || evt.target.textContent === 'Offers') { return; }
     evt.preventDefault();
     this._callback.selectSortType(evt.target.dataset.sort);
   };
