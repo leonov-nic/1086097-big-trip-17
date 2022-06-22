@@ -1,18 +1,18 @@
 import AbstractView from '../framework/view/abstract-view';
-import { filters } from '../utils/filter';
+import { FilterType } from '../const';
 
-const createTripFilterTemplate = () => {
+const createTripFilterTemplate = (currentFilterType, filterLockValues) => {
+  const genetateFilters = () => {
+    const filterNames = Object.values(FilterType);
+    const futureLock = filterLockValues ? Object.entries(filterLockValues)[0] : {};
+    const pastLock =  filterLockValues ? Object.entries(filterLockValues)[1] : {};
 
-  const genetateFilters = () => (
-    filters ? `${Object.keys(filters).map((filterName) =>
-      `
-      <div class="trip-filters__filter">
-        <input id="filter-${filterName}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterName}" ${filterName && filterName === 'Everything' ? 'checked' : ''}>
-        <label class="trip-filters__filter-label" for="filter-${filterName}">${filterName}</label>
-      </div>
-      `
-    ).join('')}` : ''
-  );
+    return (FilterType ? `${filterNames.map((filterName) =>
+      `<div class="trip-filters__filter">
+        <input id="filter-${filterName}" class="trip-filters__filter-input visually-hidden" type="radio" ${futureLock[0] === filterName && futureLock[1] === false || pastLock[0] === filterName && pastLock[1] === false ? 'disabled' : ''} name="trip-filter-${filterName}" value="${filterName}" ${currentFilterType === filterName ? 'checked' : ''}>
+        <label class="trip-filters__filter-label" for="filter-${filterName}" ${futureLock[0] === filterName && futureLock[1] === false || pastLock[0] === filterName && pastLock[1] === false ? 'data-disabled="disabled"' : ''}  data-filter="${filterName}">${filterName}</label>
+      </div>`).join('')}` : '');
+  };
 
   return (`
     <form class="trip-filters" action="#" method="get">
@@ -23,15 +23,30 @@ const createTripFilterTemplate = () => {
   `);
 };
 
-export class TripFilterView extends AbstractView {
-  #trips = null;
+export default class TripFilterView extends AbstractView {
+  #currentFilterType = null;
+  #filterLock = null;
+  #filterLockValues = {};
 
-  constructor(trips) {
+  constructor(currentFilterType, filterLockValues) {
     super();
-    this.#trips = trips;
+    this.#filterLockValues = filterLockValues;
+    this.#currentFilterType = currentFilterType;
   }
 
   get template() {
-    return createTripFilterTemplate(this.#trips);
+    return createTripFilterTemplate(this.#currentFilterType, this.#filterLockValues);
   }
+
+  setFilterTypeChangeHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
+  };
+
+  #filterTypeChangeHandler = (evt) => {
+    if (evt.target.getAttribute('data-disabled') === 'disabled') { return; }
+    if (evt.target.tagName !== 'LABEL') { return; }
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.dataset.filter);
+  };
 }

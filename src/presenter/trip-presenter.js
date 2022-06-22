@@ -1,82 +1,137 @@
-import { render, replace } from '../framework/render';
-import { tripSortView } from '../view/trip-sort-view';
-import { TripListView } from '../view/trip-list-view';
-import { TripFormView } from '../view/trip-form-view';
-import { TripView } from '../view/trip-view';
-import NoTripsView from '../view/no-trips-view';
+import { render, replace, remove } from '../framework/render';
 import { isEscKeyDown } from '../utils/common';
+import { UserAction, UpdateType, Mode } from '../const';
+import TripFormView from '../view/trip-form-view';
+import TripView from '../view/trip-view';
 
-export class TripPresenter {
-  #tripListComponent = new TripListView();
-  #noTripsComponent = new NoTripsView();
-  #tripContainer = null;
-  #tripsModel = null;
-  #trips = null;
+export default class TripPresenter {
+  #trip = null;
+  #allOffers = null;
+  #allDestinations = null;
+  #tripListComponent = null;
+  #changeData = null;
+  #tripComponent = null;
+  #formComponent = null;
+  #changeMode = null;
+  #mode = Mode.DEFAULT;
 
-  constructor (tripContainer, tripsModel) {
-    this.#tripContainer = tripContainer;
-    this.#tripsModel = tripsModel;
+  constructor (listComponent, changeDate, changeMode, alloffers, destinations) {
+    this.#tripListComponent = listComponent;
+    this.#changeData = changeDate;
+    this.#changeMode = changeMode;
+    this.#allOffers = alloffers;
+    this.#allDestinations = destinations;
   }
 
-  init = () => {
-    this.#trips = [...this.#tripsModel.trips];
-    this.#renderList();
-  };
+  init = (trip) => {
+    this.#trip = trip;
 
-  #renderList = () => {
-    if (this.#trips.every((trip) => trip.isThere)) {
-      render(this.#tripListComponent, this.#tripContainer);
-      render(this.#noTripsComponent, this.#tripListComponent.element);
+    const prevTripComponent = this.#tripComponent;
+    const prevFormComponent = this.#formComponent;
+
+    this.#tripComponent = new TripView(trip);
+    this.#formComponent = new TripFormView(trip, this.#allOffers, this.#allDestinations, false, this.#onEscKeyDown);
+
+    this.#tripComponent.setToFormClickHandler(this.#replaceTripToForm);
+    this.#tripComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+    this.#formComponent.setCloseFormClickHandler(this.#replaceFormToTrip);
+    this.#formComponent.setFormSubmitHandler(this.#handleFormSubmit);
+    this.#formComponent.setDeleteFormClickHandler(this.#handleDeleteClick);
+    this.#formComponent.setAddDeleteOffersHandler();
+
+    if (prevTripComponent === null || prevFormComponent === null) {
+      render(this.#tripComponent, this.#tripListComponent);
       return;
     }
 
-    render(new tripSortView, this.#tripContainer);
-    render(this.#tripListComponent, this.#tripContainer);
+    if (this.#mode === Mode.DEFAULT) {
+      replace(this.#tripComponent, prevTripComponent);
+    }
 
-    for (let i = 0; i < this.#trips.length; i++) {
-      this.#renderTrip(this.#trips[i]);
+    if (this.#mode === Mode.EDITING) {
+      replace(this.#formComponent, prevFormComponent);
+    }
+
+    remove(prevTripComponent);
+    remove(prevFormComponent);
+  };
+
+  destroy = () => {
+    remove(this.#tripComponent);
+    remove(this.#formComponent);
+  };
+
+  resetView = () => {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#formComponent.reset(this.#trip);
+      this.#replaceFormToTrip();
     }
   };
 
-  #renderTrip = (trip) => {
-    const tripComponent = new TripView(trip);
-    const tripFormComponent = new TripFormView(trip);
+  setSaving = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#formComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  };
 
-    const replaceFormToTrip = () => {
-      replace(tripComponent, tripFormComponent);
-      // tripFormComponent.element.classList.remove('active');
+  setDeleting = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#formComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#tripComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#formComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
     };
 
-    const onEscKeyDown = (evt) => {
-      isEscKeyDown(evt, replaceFormToTrip);
-      document.removeEventListener('keydown', onEscKeyDown);
-    };
+    this.#formComponent.shake(resetFormState);
+  };
 
-    const replaceTripToForm = () => {
-      // for(let i = 0; i < this.#tripListComponent.element.children.length; i++) {
-      //   if (this.#tripListComponent.element.children[i].classList.contains('active')) {
-      //     this.#tripListComponent.element.children[i].remove();
-      //   }
-      // }
-      replace(tripFormComponent, tripComponent);
-      // tripFormComponent.element.classList.add('active');
-    };
+  #replaceFormToTrip = () => {
+    this.#formComponent.reset(this.#trip);
+    replace(this.#tripComponent, this.#formComponent);
 
-    tripComponent.setToFormClickHandler(() => {
-      replaceTripToForm();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
+    this.#mode = Mode.DEFAULT;
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
 
-    tripFormComponent.setCloseFormClickHandler(() => {
-      replaceFormToTrip();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
+  #replaceTripToForm = () => {
+    replace(this.#formComponent, this.#tripComponent);
+    document.addEventListener('keydown', this.#onEscKeyDown);
+    this.#changeMode();
+    this.#mode = Mode.EDITING;
+  };
 
-    tripFormComponent.setFormSubmitHandler(() => {
-      replaceFormToTrip();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
+  #onEscKeyDown = (evt) => {
+    isEscKeyDown(evt, this.#replaceFormToTrip);
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
 
-    render(tripComponent, this.#tripListComponent.element);
+  #handleFavoriteClick = () => {
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.PATCH, {...this.#trip, isFavorite: !this.#trip.isFavorite});
+  };
+
+  #handleFormSubmit = (update) => {
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.MINOR, update);
+  };
+
+  #handleDeleteClick = (trip) => {
+    this.#changeData(UserAction.DELETE_TRIP, UpdateType.MINOR, trip);
   };
 }

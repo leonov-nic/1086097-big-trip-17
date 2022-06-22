@@ -7,11 +7,13 @@ const createTripTemplate = (trip) => {
   const dateFinish = dateTo !== null ? humanizeTripDueDate(dateTo) : '';
   const dateMonth = humanizeTripDueDateTwo(dateFrom);
   const dateStart = dateFrom !== null ? humanizeTripDueDate(dateFrom) : '';
+
   const durationTime = getDurationTime(dateTo, dateFrom);
+
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
   const createAdditionalServices = () => (
-    offers.offers ? `${Object.values(offers.offers).map((offer) =>
+    offers ? `${Object.values(offers).map((offer) =>
       `
       <li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>
@@ -59,16 +61,16 @@ const createTripTemplate = (trip) => {
   `);
 };
 
-export class TripView extends AbstractView {
+export default class TripView extends AbstractView {
   #trip = null;
 
   constructor(trip) {
     super();
-    this.trip = trip;
+    this.#trip = trip;
   }
 
   get template() {
-    return createTripTemplate(this.trip);
+    return createTripTemplate(this.#trip);
   }
 
   setToFormClickHandler = (callback) => {
@@ -79,5 +81,15 @@ export class TripView extends AbstractView {
   #toFormClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  };
+
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
   };
 }

@@ -1,9 +1,22 @@
 import AbstractView from '../framework/view/abstract-view';
+import { NoTripsTextType } from '../const';
 
-const createTripLoadingTemplate = () => '<p class="trip-events__msg">Click New Event to create your first point</p>';
+const createTripLoadingTemplate = (filterType) => {
+
+  const textValue = NoTripsTextType[filterType];
+
+  return (`<p class="trip-events__msg">${textValue}</p>`);
+};
 
 export default class NoTripsView extends AbstractView {
+  #filterType = null;
+
+  constructor (filterType) {
+    super();
+    this.#filterType = filterType;
+  }
+
   get template() {
-    return createTripLoadingTemplate();
+    return createTripLoadingTemplate(this.#filterType );
   }
 }
