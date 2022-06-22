@@ -68,39 +68,6 @@ export default class TripPresenter {
     }
   };
 
-  #replaceFormToTrip = () => {
-    this.#formComponent.reset(this.#trip);
-    replace(this.#tripComponent, this.#formComponent);
-
-    this.#mode = Mode.DEFAULT;
-    document.removeEventListener('keydown', this.#onEscKeyDown);
-  };
-
-  #replaceTripToForm = () => {
-    replace(this.#formComponent, this.#tripComponent);
-    document.addEventListener('keydown', this.#onEscKeyDown);
-    this.#changeMode();
-    this.#mode = Mode.EDITING;
-  };
-
-  #onEscKeyDown = (evt) => {
-    isEscKeyDown(evt, this.#replaceFormToTrip);
-    document.removeEventListener('keydown', this.#onEscKeyDown);
-  };
-
-  #handleFavoriteClick = () => {
-    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.PATCH, {...this.#trip, isFavorite: !this.#trip.isFavorite});
-  };
-
-  #handleFormSubmit = (update) => {
-    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.MINOR, update);
-    // this.#replaceFormToTrip();
-  };
-
-  #handleDeleteClick = (trip) => {
-    this.#changeData(UserAction.DELETE_TRIP, UpdateType.MINOR, trip);
-  };
-
   setSaving = () => {
     if (this.#mode === Mode.EDITING) {
       this.#formComponent.updateElement({
@@ -134,5 +101,37 @@ export default class TripPresenter {
     };
 
     this.#formComponent.shake(resetFormState);
+  };
+
+  #replaceFormToTrip = () => {
+    this.#formComponent.reset(this.#trip);
+    replace(this.#tripComponent, this.#formComponent);
+
+    this.#mode = Mode.DEFAULT;
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #replaceTripToForm = () => {
+    replace(this.#formComponent, this.#tripComponent);
+    document.addEventListener('keydown', this.#onEscKeyDown);
+    this.#changeMode();
+    this.#mode = Mode.EDITING;
+  };
+
+  #onEscKeyDown = (evt) => {
+    isEscKeyDown(evt, this.#replaceFormToTrip);
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #handleFavoriteClick = () => {
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.PATCH, {...this.#trip, isFavorite: !this.#trip.isFavorite});
+  };
+
+  #handleFormSubmit = (update) => {
+    this.#changeData(UserAction.UPDATE_TRIP, UpdateType.MINOR, update);
+  };
+
+  #handleDeleteClick = (trip) => {
+    this.#changeData(UserAction.DELETE_TRIP, UpdateType.MINOR, trip);
   };
 }
