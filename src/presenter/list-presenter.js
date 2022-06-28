@@ -12,8 +12,11 @@ import TripLoadingView from '../view/trip-loading-view';
 import TripPresenter from './trip-presenter';
 import FilterPresenter from './filter-presenter';
 import NewTripPresenter from './trip-new-presenter';
+import AddTripsButtonView from '../view/add-trips-button-view';
+const TRIP_COUNT_PER_STEP = 2;
 
 export default class ListPresenter {
+  #addTripsButtonViewComponent = null;
   #newEventButtonViewComponent = null;
   #sortComponent = null;
   #infoComponent = null;
@@ -32,6 +35,8 @@ export default class ListPresenter {
   #tripPresenter = new Map();
   #tripNewPresenter = null;
   #filterPresenter = null;
+  #allPriceOfJourney = [];
+  #renderedTripCount = TRIP_COUNT_PER_STEP;
 
   constructor (tripContainer, filterContainer, mainContainer, tripsModel, filterModel) {
     this.#tripsModel = tripsModel;
@@ -52,6 +57,7 @@ export default class ListPresenter {
         this.#renderButtonNewTrip();
       });
     this.#renderListOfTrips();
+
   };
 
   get allOffers() {
@@ -80,11 +86,6 @@ export default class ListPresenter {
     }
     return filteredTrips;
   }
-
-  #isSomeTripsFutureAndPast = () => {
-    const trips = this.#tripsModel.trips;
-    return {Future: filter.Future(trips).length > 0, Past: filter.Past(trips).length > 0};
-  };
 
   #handleViewAction = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
@@ -144,6 +145,30 @@ export default class ListPresenter {
     }
   };
 
+  #isSomeTripsFutureAndPast = () => {
+    const trips = this.#tripsModel.trips;
+    return {Future: filter.Future(trips).length > 0, Past: filter.Past(trips).length > 0};
+  };
+
+  #renderLoadMoreButton = () => {
+    this.#addTripsButtonViewComponent = new AddTripsButtonView();
+    this.#addTripsButtonViewComponent.setClickHandler(this.#handleLoadMoreButtonClick);
+    render(this.#addTripsButtonViewComponent, this.#tripContainer, RenderPosition.AFTEREND);
+  };
+
+  #handleLoadMoreButtonClick = () => {
+    const tripCount = this.trips.length;
+    const newRenderedTripCount = Math.min(tripCount, this.#renderedTripCount + TRIP_COUNT_PER_STEP);
+    const trips = this.trips.slice(this.#renderedTripCount, newRenderedTripCount);
+
+    this.#renderTrips(trips);
+    this.#renderedTripCount = newRenderedTripCount;
+
+    if (this.#renderedTripCount >= tripCount) {
+      remove(this.#addTripsButtonViewComponent);
+    }
+  };
+
   #renderButtonNewTrip = () => {
     this.#newEventButtonViewComponent = new NewEventButtonView();
     this.#newEventButtonViewComponent.setClickHandler(this.#handleNewTripButtonClick);
@@ -184,6 +209,7 @@ export default class ListPresenter {
     this.#renderInfo();
     this.#renderSort();
     this.#renderTrips(this.trips);
+    this.#renderLoadMoreButton();
   };
 
   #renderSort = () => {
@@ -193,7 +219,20 @@ export default class ListPresenter {
   };
 
   #renderInfo = () => {
+    const basicСostOfAllOffers = this.trips.map((item) => Number(item.basePrice)).reduce((sum, elem) => sum + elem);
+    const costOfAllOffers = [];
+
+    this.trips.forEach((trip) => {
+      if (trip.offers) { trip.offers.forEach((offer) => costOfAllOffers.push(offer.price)); }
+    });
+    const sumOfAllOffers = costOfAllOffers.reduce((sum, offer) => sum + offer);
+    const totalСost = sumOfAllOffers + basicСostOfAllOffers;
+
+    this.#allPriceOfJourney.push(totalСost);
+    if(this.#allPriceOfJourney.length > 2) { this.#allPriceOfJourney.shift(); }
+
     this.#infoComponent = new TripInfoView(this.#tripsModel.trips);
+    this.#infoComponent.setTotalSum(this.#allPriceOfJourney[0], totalСost);
     render(this.#infoComponent, this.#mainContainer, RenderPosition.AFTERBEGIN);
   };
 
@@ -227,7 +266,7 @@ export default class ListPresenter {
 
   #renderTrip = (trip) => {
     const tripPresenter = new TripPresenter(this.#tripListComponent.element, this.#handleViewAction, this.#handleModeChange, this.allOffers, this.destinations);
-    tripPresenter.init(trip, );
+    tripPresenter.init(trip);
     this.#tripPresenter.set(trip.id, tripPresenter);
   };
 
@@ -240,10 +279,13 @@ export default class ListPresenter {
     remove(this.#noTripsComponent);
     remove(this.#infoComponent);
     remove(this.#loadingComponent);
+    remove(this.#addTripsButtonViewComponent);
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
     }
+
+    this.#renderedTripCount = TRIP_COUNT_PER_STEP;
   };
 
   #handleModeChange = () => {

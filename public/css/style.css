@@ -141,9 +141,11 @@ main {
   .btn--blue {
     color: #ffffff;
     background-color: #0d8ae4; }
-  .btn:disabled {
-    opacity: 0.46;
-    cursor: default; }
+  .btn--blue {
+    color: #ffffff;
+    background-color: #0d8ae4; }
+  .btn--mb {
+    margin-bottom: 40px; }
 
 .page-header {
   padding-top: 23px;
