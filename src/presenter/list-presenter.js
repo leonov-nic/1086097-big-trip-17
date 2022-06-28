@@ -12,8 +12,10 @@ import TripLoadingView from '../view/trip-loading-view';
 import TripPresenter from './trip-presenter';
 import FilterPresenter from './filter-presenter';
 import NewTripPresenter from './trip-new-presenter';
+import AddTripsButtonView from '../view/add-trips-button-view';
 
 export default class ListPresenter {
+  #addTripsButtonViewComponent = null;
   #newEventButtonViewComponent = null;
   #sortComponent = null;
   #infoComponent = null;
@@ -81,11 +83,6 @@ export default class ListPresenter {
     return filteredTrips;
   }
 
-  #isSomeTripsFutureAndPast = () => {
-    const trips = this.#tripsModel.trips;
-    return {Future: filter.Future(trips).length > 0, Past: filter.Past(trips).length > 0};
-  };
-
   #handleViewAction = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
 
@@ -144,6 +141,16 @@ export default class ListPresenter {
     }
   };
 
+  #isSomeTripsFutureAndPast = () => {
+    const trips = this.#tripsModel.trips;
+    return {Future: filter.Future(trips).length > 0, Past: filter.Past(trips).length > 0};
+  };
+
+  #renderAddTripsButton = () => {
+    this.#addTripsButtonViewComponent = new AddTripsButtonView();
+    render(this.#addTripsButtonViewComponent, this.#tripListComponent.element);
+  };
+
   #renderButtonNewTrip = () => {
     this.#newEventButtonViewComponent = new NewEventButtonView();
     this.#newEventButtonViewComponent.setClickHandler(this.#handleNewTripButtonClick);
@@ -184,6 +191,7 @@ export default class ListPresenter {
     this.#renderInfo();
     this.#renderSort();
     this.#renderTrips(this.trips);
+    this.#renderAddTripsButton();
   };
 
   #renderSort = () => {
