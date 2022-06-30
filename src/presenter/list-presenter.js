@@ -13,10 +13,10 @@ import TripPresenter from './trip-presenter';
 import FilterPresenter from './filter-presenter';
 import NewTripPresenter from './trip-new-presenter';
 import AddTripsButtonView from '../view/add-trips-button-view';
-const TRIP_COUNT_PER_STEP = 2;
+const TRIP_COUNT_PER_STEP = 4;
 
 export default class ListPresenter {
-  #addTripsButtonViewComponent = null;
+  #loadMoreButtonViewComponent = null;
   #newEventButtonViewComponent = null;
   #sortComponent = null;
   #infoComponent = null;
@@ -37,6 +37,7 @@ export default class ListPresenter {
   #filterPresenter = null;
   #allPriceOfJourney = [];
   #renderedTripCount = TRIP_COUNT_PER_STEP;
+  #isChangeTextOfButtonLoadMore = false;
 
   constructor (tripContainer, filterContainer, mainContainer, tripsModel, filterModel) {
     this.#tripsModel = tripsModel;
@@ -73,7 +74,6 @@ export default class ListPresenter {
   get trips() {
     this.#filterType = this.#filterModel.filter;
     const trips = this.#tripsModel.trips;
-
     const filteredTrips = filter[this.#filterType](trips);
 
     switch (this.#currentSortType) {
@@ -145,15 +145,41 @@ export default class ListPresenter {
     }
   };
 
+  #renderListOfTrips = () => {
+    const trips = this.trips;
+    const tripsCount = trips.length;
+
+    this.#renderList();
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
+    if (tripsCount === 0) {
+      this.#renderNoTrips();
+      return;
+    }
+
+    this.#renderInfo();
+    this.#renderSort();
+
+    this.#renderTrips(trips.slice(0, Math.min(tripsCount, this.#renderedTripCount)));
+
+    if (tripsCount > this.#renderedTripCount) {
+      this.#renderLoadMoreButton();
+    }
+  };
+
   #isSomeTripsFutureAndPast = () => {
     const trips = this.#tripsModel.trips;
     return {Future: filter.Future(trips).length > 0, Past: filter.Past(trips).length > 0};
   };
 
   #renderLoadMoreButton = () => {
-    this.#addTripsButtonViewComponent = new AddTripsButtonView();
-    this.#addTripsButtonViewComponent.setClickHandler(this.#handleLoadMoreButtonClick);
-    render(this.#addTripsButtonViewComponent, this.#tripContainer, RenderPosition.AFTEREND);
+    this.#loadMoreButtonViewComponent = new AddTripsButtonView(this.#isChangeTextOfButtonLoadMore);
+    this.#loadMoreButtonViewComponent.setClickHandler(this.#handleLoadMoreButtonClick, this.#isChangeTextOfButtonLoadMore);
+    render(this.#loadMoreButtonViewComponent, this.#tripContainer, RenderPosition.AFTEREND);
   };
 
   #handleLoadMoreButtonClick = () => {
@@ -165,8 +191,18 @@ export default class ListPresenter {
     this.#renderedTripCount = newRenderedTripCount;
 
     if (this.#renderedTripCount >= tripCount) {
-      remove(this.#addTripsButtonViewComponent);
+      remove(this.#loadMoreButtonViewComponent);
+      this.#isChangeTextOfButtonLoadMore = true;
+      this.#renderLoadMoreButton();
+      this.#loadMoreButtonViewComponent.setHideClickHandler(this.#handleLoadMoreButtonClickHideTrips);
     }
+  };
+
+  #handleLoadMoreButtonClickHideTrips = () => {
+    this.#renderedTripCount = TRIP_COUNT_PER_STEP;
+    this.#isChangeTextOfButtonLoadMore = false;
+    this.#clearList();
+    this.#renderListOfTrips();
   };
 
   #renderButtonNewTrip = () => {
@@ -188,28 +224,6 @@ export default class ListPresenter {
   #handleNewTripButtonClick = () => {
     this.createNewTrip(this.#handleNewTripFormClose);
     this.#newEventButtonViewComponent.element.disabled = true;
-  };
-
-  #renderListOfTrips = () => {
-    this.#renderList();
-
-    if (this.#isLoading) {
-      this.#renderLoading();
-      return;
-    }
-
-    const trips = this.trips;
-    const tripsCount = trips.length;
-
-    if (tripsCount === 0) {
-      this.#renderNoTrips();
-      return;
-    }
-
-    this.#renderInfo();
-    this.#renderSort();
-    this.#renderTrips(this.trips);
-    this.#renderLoadMoreButton();
   };
 
   #renderSort = () => {
@@ -275,17 +289,25 @@ export default class ListPresenter {
     this.#tripPresenter.clear();
     this.#tripNewPresenter.destroy();
 
+
+    if (this.#noTripsComponent) {
+      remove(this.#noTripsComponent);
+    }
     remove(this.#sortComponent);
-    remove(this.#noTripsComponent);
     remove(this.#infoComponent);
     remove(this.#loadingComponent);
-    remove(this.#addTripsButtonViewComponent);
+    remove(this.#loadMoreButtonViewComponent);
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
     }
 
-    this.#renderedTripCount = TRIP_COUNT_PER_STEP;
+    if (resetSortType) {
+      this.#renderedTripCount = TRIP_COUNT_PER_STEP;
+    } else {
+      const tripsCount = this.trips.length;
+      this.#renderedTripCount = Math.min(tripsCount, this.#renderedTripCount);
+    }
   };
 
   #handleModeChange = () => {

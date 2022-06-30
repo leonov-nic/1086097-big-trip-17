@@ -1,26 +1,39 @@
 import AbstractView from '../framework/view/abstract-view';
 
-const createNewEventButton = () => (
-  `<button class="trip-main__event-add-btn  btn  btn--big  btn--blue btn--mb" type="button">Load more events</button>
+const createNewEventButton = (isChangeButtonText) => (
+  `<button class="trip-main__event-add-btn  btn  btn--big  ${!isChangeButtonText ? 'btn--blue' : 'btn--red'} btn--mb" type="button">${!isChangeButtonText ? 'Load more events' : 'Hide events'}</button>
   `);
 
 export default class AddTripsButtonView extends AbstractView {
-  constructor () {
+  #isChangeButtonText = false;
+
+  constructor(isChangeButtonText) {
     super();
+    this.#isChangeButtonText = isChangeButtonText;
   }
 
   get template() {
-    return createNewEventButton();
+    return createNewEventButton(this.#isChangeButtonText);
   }
 
-  setClickHandler = (callback) => {
+  setClickHandler = (callback, isChangeButtonText) => {
+    this.#isChangeButtonText = isChangeButtonText;
     this._callback.loadMoreClick = callback;
     this.element.addEventListener('click', this.#clickHandler);
   };
 
   #clickHandler = (evt) => {
     evt.preventDefault();
-    console.log('hello');
     this._callback.loadMoreClick();
+  };
+
+  setHideClickHandler = (callback) => {
+    this._callback.hideClick = callback;
+    this.element.addEventListener('click', this.#hideClickHandler);
+  };
+
+  #hideClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.hideClick();
   };
 }
