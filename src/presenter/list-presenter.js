@@ -58,7 +58,6 @@ export default class ListPresenter {
         this.#renderButtonNewTrip();
       });
     this.#renderListOfTrips();
-
   };
 
   get allOffers() {
@@ -126,12 +125,12 @@ export default class ListPresenter {
         this.#tripPresenter.get(updatedTrip.id).init(updatedTrip);
         break;
       case UpdateType.MINOR:
-        this.#clearList();
+        this.#clearList({resetRenderedTripCount: true});
         this.#renderListOfTrips();
         this.#filterPresenter.init(this.#isSomeTripsFutureAndPast());
         break;
       case UpdateType.MAJOR:
-        this.#clearList({resetSortType: true});
+        this.#clearList({resetRenderedTripCount: true, resetSortType: true});
         this.#renderListOfTrips();
         this.#filterPresenter.init(this.#isSomeTripsFutureAndPast());
         break;
@@ -284,7 +283,7 @@ export default class ListPresenter {
     this.#tripPresenter.set(trip.id, tripPresenter);
   };
 
-  #clearList = ({resetSortType = false} = {}) => {
+  #clearList = ({resetRenderedTripCount = false, resetSortType = false} = {}) => {
     this.#tripPresenter.forEach((presenter) => presenter.destroy());
     this.#tripPresenter.clear();
     this.#tripNewPresenter.destroy();
@@ -302,8 +301,9 @@ export default class ListPresenter {
       this.#currentSortType = SortType.DEFAULT;
     }
 
-    if (resetSortType) {
+    if (resetRenderedTripCount) {
       this.#renderedTripCount = TRIP_COUNT_PER_STEP;
+      this.#isChangeTextOfButtonLoadMore = false;
     } else {
       const tripsCount = this.trips.length;
       this.#renderedTripCount = Math.min(tripsCount, this.#renderedTripCount);

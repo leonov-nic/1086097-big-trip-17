@@ -51,9 +51,7 @@
         ANIMATION_FINISH_STATE;
 
       // Определение целого значения числа на текущем шаге анимации.
-      const currentValueToRender = (this._requiredValue > this._startValue) ?
-        Math.trunc(this._requiredValue * animationState) :
-        Math.trunc(this._startValue - (this._startValue - this._requiredValue) * animationState);
+      const currentValueToRender = Math.trunc(this._startValue - (this._startValue - this._requiredValue) * animationState);
 
       // Отрисовка числа.
       this._setElementValue(currentValueToRender);
@@ -76,7 +74,7 @@
      * @param {number} value — новое значение элемента
      */
     _setElementValue(value) {
-      this._element.textContent = value.toLocaleString(`ru-RU`);
+      this._element.textContent = value.toLocaleString('ru-RU');
     }
-  }
+  };
 })();
