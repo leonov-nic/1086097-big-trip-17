@@ -156,7 +156,7 @@ main {
   .btn--red::before {
     content: "\25B2\000A0"; }
   .btn--mb {
-    margin-bottom: 40px; }
+    margin-bottom: 60px; }
 
 .page-header {
   padding-top: 23px;
